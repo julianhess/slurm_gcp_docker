@@ -36,11 +36,11 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
    sudo apt-get install munge libmunge-dev
    ```
 
-   2.x. Miscellaneous: to support cgroups and readline in the Slurm console
+   2.3. Miscellaneous: to support cgroups and readline in the Slurm console
    ```bash
    sudo apt-get install libhwloc-dev cgroup-tools libreadline-dev
    ```
-2. Install Slurm
+3. Install Slurm
  
    3.1. Download
    ```bash
