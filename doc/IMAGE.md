@@ -58,3 +58,19 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
    ```bash
    make && sudo make install
    ```
+
+4. Post-install configuration
+
+   4.1. Enable cgroup enforcement by adding `group_enable=memory swapaccount=1` to
+   `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`
+
+   4.2. Add slurm user
+   ```bash
+   sudo adduser slurm
+   ```
+
+   4.3. Add Slurm logging directory
+   ```bash
+   sudo mkdir -p /var/spool/slurm
+   sudo chown slurm:slurm /var/spool/slurm
+   ```
