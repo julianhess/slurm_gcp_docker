@@ -19,6 +19,12 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
 
 0. Set up dev environment
 
+   * Update apt package list
+     
+     ```bash
+     sudo apt-get update
+     ```
+
    * Install `build-essential` (C/C++ compilers and headers)
    
      ```bash
@@ -110,7 +116,7 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
    * Add slurm user
    
      ```bash
-     sudo adduser slurm
+     sudo adduser --disabled-password slurm
      ```
 
    * Add Slurm logging directory
