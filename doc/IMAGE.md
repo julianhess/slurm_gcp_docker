@@ -9,68 +9,112 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
 
 0. Set up dev environment
 
-   0.1. Install `build-essential` (C/C++ compilers and headers)
-   ```bash
-   sudo apt-get install build-essential
-   ```
+   * Install `build-essential` (C/C++ compilers and headers)
+   
+     ```bash
+     sudo apt-get install build-essential
+     ```
 
-   0.2. The Slurm installer explicitly expects `/usr/bin/env python`
+   * The Slurm installer explicitly expects `/usr/bin/env python`
    to be defined; thus we must
-   ```bash
-   sudo ln -s /usr/bin/python3 /usr/bin/python
-   ```
-
+   
+     ```bash
+     sudo ln -s /usr/bin/python3 /usr/bin/python
+     ```
+   
 1. Install NFS
+ 
    ```bash
    sudo apt-get install nfs-kernel-server nfs-common portmap
    ```
+
+   Since the master and worker nodes will have different NFS configurations (client vs.
+   server), all NFS configuration (e.g., configuring `/etc/exports` and `/etc/fstab`) will
+   happen when the nodes are launched.
+
 2. Install Slurm dependencies
 
-   2.1. MySQL (MariaDB)
-   ```bash
-   sudo apt-get install libmariadb-dev mariadb-client
-   ```
+   * MySQL (MariaDB)
+   
+      ```bash
+      sudo apt-get install libmariadb-dev mariadb-client mariadb-server
+      ```
 
-   2.2. Munge
-   ```bash
-   sudo apt-get install munge libmunge-dev
-   ```
+   * Munge
+   
+     ```bash
+     sudo apt-get install munge libmunge-dev
+     ```
 
-   2.3. Miscellaneous: to support cgroups and readline in the Slurm console
-   ```bash
-   sudo apt-get install libhwloc-dev cgroup-tools libreadline-dev
-   ```
+   * Miscellaneous: to support cgroups and readline in the Slurm console
+   
+     ```bash
+     sudo apt-get install libhwloc-dev cgroup-tools libreadline-dev
+     ```
+   
 3. Install Slurm
  
-   3.1. Download
-   ```bash
-   wget https://download.schedmd.com/slurm/slurm-19.05.3-2.tar.bz2 && \
-   tar xjf slurm-19.05.3-2.tar.bz2
-   ```
+   - Download
+   
+      ```bash
+      wget https://download.schedmd.com/slurm/slurm-19.05.3-2.tar.bz2 && \
+      tar xjf slurm-19.05.3-2.tar.bz2
+      ```
+      
+      This is the latest version as of November 2019.
 
-   3.2. Configure
-   ```bash
-   cd slurm-19.05.3-2 && \
-   ./configure --prefix=/usr/local --sysconfdir=/usr/local/etc --with-mysql_config=/usr/bin --with-hdf5=no
-   ```
+   * Configure
+   
+      ```bash
+      cd slurm-19.05.3-2 && \
+      ./configure --prefix=/usr/local --sysconfdir=/usr/local/etc --with-mysql_config=/usr/bin --with-hdf5=no
+      ```
+      
+      Note that we must explictly instruct the installer to link with MySQL libraries; this
+      is not automatic. If HDF5 libraries are present, a strange bug prevents installation;
+      since we will not use HDF5 in our cluster, we preemptively disable linking as a
+      precaution.
 
-   3.3. Build and install
-   ```bash
-   make && sudo make install
-   ```
+   * Build and install
+   
+      ```bash
+      make && sudo make install
+      ```
+      
+      This will install Slurm's daemons (`slurmctld`, `slurmd`, and `slurmdbd`) to
+      `/usr/local/sbin`, and Slurm's client utilities (e.g., `sinfo`, `squeue`, etc.)
+      to `/usr/local/bin`/
 
 4. Post-install configuration
 
-   4.1. Enable cgroup enforcement by adding `group_enable=memory swapaccount=1` to
-   `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`
+   * Enable cgroup enforcement by adding `group_enable=memory swapaccount=1` to whatever
+     already exists in `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`
 
-   4.2. Add slurm user
-   ```bash
-   sudo adduser slurm
-   ```
+   * Add slurm user
+   
+     ```bash
+     sudo adduser slurm
+     ```
 
-   4.3. Add Slurm logging directory
-   ```bash
-   sudo mkdir -p /var/spool/slurm
-   sudo chown slurm:slurm /var/spool/slurm
-   ```
+   * Add Slurm logging directory
+   
+     ```bash
+     sudo mkdir -p /var/spool/slurm
+     sudo chown slurm:slurm /var/spool/slurm
+     ```
+
+   * Setup MySQL
+   
+      **Start service** (note we do not enable it, since only the server will need it). We 
+      just do this here to add the requisite user and permissions.
+   
+      ```bash
+      sudo systemctl start mariadb
+      ```
+   
+      **Configure MySQL**
+   
+      ```bash
+      sudo mysql -u root -e "create user 'slurm'@'localhost'"
+      sudo mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';"
+      ```
