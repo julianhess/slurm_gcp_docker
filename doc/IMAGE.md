@@ -3,9 +3,19 @@
 All compute nodes (controller + workers) are spun up with an identical 
 image — whether they serve as a controller or worker depends on external inputs (provision script).
 
-This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are steps to build our cluster image from this base image.
+This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are steps to build our cluster image from this bare image. In theory, all of these steps to can be done programatically; I just haven't created a script for it yet.
 
 ## Steps to generate image:
+
+0. Create dummy VM with bare image
+
+   ```bash
+   gcloud compute --project <project> instances create <instance name> --zone <zone> \
+   --machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20191113 \
+   --image-project ubuntu-os-cloud --boot-disk-size 10GB --boot-disk-type pd-standard
+   ```
+   
+   After we've cloned an image from this machine, we can go ahead and delete it.
 
 0. Set up dev environment
 
