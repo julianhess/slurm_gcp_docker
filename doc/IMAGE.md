@@ -88,7 +88,14 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
 4. Post-install configuration
 
    * Enable cgroup enforcement by adding `group_enable=memory swapaccount=1` to whatever
-     already exists in `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`
+     already exists in `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`.
+     
+     To do this programatically, we will use `ssed`:
+     
+     ```bash
+     sudo apt-get install ssed
+     sudo  ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 group_enable=memory swapaccount=1"\3/' /etc/default/grub
+     ```
 
    * Add slurm user
    
