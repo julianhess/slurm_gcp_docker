@@ -34,7 +34,7 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
    * Some other necessary tools
 
      ```bash
-     sudo apt-get install vim git
+     sudo apt-get install vim git python3-pip
      ```
 
    * The Slurm installer explicitly expects `/usr/bin/env python`
@@ -43,7 +43,13 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
      ```bash
      sudo ln -s /usr/bin/python3 /usr/bin/python
      ```
+     
+     and just to be nice to ourselves,
    
+     ```bash
+     sudo ln -s /usr/bin/pip3 /usr/bin/pip
+     ```
+     
 1. Install NFS
  
    ```bash
