@@ -30,6 +30,12 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
      ```bash
      sudo apt-get install build-essential
      ```
+     
+   * Some other necessary tools
+
+     ```bash
+     sudo apt-get install vim git
+     ```
 
    * The Slurm installer explicitly expects `/usr/bin/env python`
    to be defined; thus we must
@@ -132,16 +138,28 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
 
    * Setup MySQL
    
-      **Start service** (note we do not enable it, since only the server will need it). We 
-      just do this here to add the requisite user and permissions.
+     **Start service** (note we do not enable it, since only the server will need it). We 
+     just do this here to add the requisite user and permissions.
    
-      ```bash
-      sudo systemctl start mariadb
-      ```
+     ```bash
+     sudo systemctl start mariadb
+     ```
    
-      **Configure MySQL**
+     **Configure MySQL**
    
-      ```bash
-      sudo mysql -u root -e "create user 'slurm'@'localhost'"
-      sudo mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';"
-      ```
+     ```bash
+     sudo mysql -u root -e "create user 'slurm'@'localhost'"
+     sudo mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';"
+     ```
+     
+     NB: this is where the current `pipeline-base` image is.
+      
+   * Mirror this repo
+      
+     ```bash
+     git clone git@github.com:julianhess/cga_pipeline.git && \
+     sudo cp -r cga_pipeline /usr/local/share/
+     ```
+    
+     NB: we won't need to do this two-step procedure when the repo is public; this is just so
+     that GitHub recognizes my personal ssh key.
