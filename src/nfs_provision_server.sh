@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Usage: attach_nfs_disk.sh <disk size in GB> [disk type] 
+# Usage: nfs_provision_server.sh <disk size in GB> [disk type] 
 
 set -e -o pipefail
 
@@ -39,3 +39,19 @@ echo -e "\nFormatting disk ...\n"
 # XXX: we assume that this will always be /dev/sdb. In the future, if we are
 #      attaching multiple disks, this might not be the case.
 sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
+
+#
+# mount NFS disk
+echo -e "\nMounting disk ...\n"
+
+# this should already be present, but let's do this just in case
+[ ! -d /mnt/nfs ] && sudo mkdir -p /mnt/nfs
+sudo mount -o discard,defaults /dev/sdb /mnt/nfs
+
+#
+# add to exports; restart NFS server
+sudo tee -a /etc/exports <<< \
+"/mnt/nfs ${HOSTNAME}-worker*(rw,async,no_subtree_check,insecure,no_root_squash)"
+
+sudo service nfs-kernel-server restart
+sudo exportfs -ra
