@@ -42,11 +42,15 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
  
    ```bash
    sudo apt-get install nfs-kernel-server nfs-common portmap
+   sudo mkdir -p /mnt/nfs
    ```
 
-   Since the master and worker nodes will have different NFS configurations (client vs.
-   server), all NFS configuration (e.g., configuring `/etc/exports` and `/etc/fstab`) will
+   Since the master and worker nodes will have different NFS configurations (server vs.
+   clients), all NFS configuration (e.g., configuring `/etc/exports`) will
    happen when the nodes are launched.
+   
+   Note that the mountpoint `/mnt/nfs` is common across both server and clients; obviously,
+   this will correspond to a mounted disk on the server and an NFS mount on the clients.
 
 2. Install Slurm dependencies
 
@@ -110,7 +114,7 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
      
      ```bash
      sudo apt-get install ssed
-     sudo  ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 group_enable=memory swapaccount=1"\3/' /etc/default/grub
+     sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 group_enable=memory swapaccount=1"\3/' /etc/default/grub
      ```
 
    * Add slurm user
