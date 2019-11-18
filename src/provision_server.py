@@ -54,20 +54,28 @@ if __name__ == "__main__":
 	# copy common files to NFS
 
 	# ensure directories exist
-	subprocess.check_call("[ ! -d /mnt/nfs/clust_conf/slurm ] && mkdir -p /mnt/nfs/clust_conf/slurm", shell = True)
-	subprocess.check_call("[ ! -d /mnt/nfs/clust_scripts ] && mkdir -p /mnt/nfs/clust_scripts", shell = True)
+	subprocess.check_call("""
+	  [ ! -d /mnt/nfs/clust_conf/slurm ] && mkdir -p /mnt/nfs/clust_conf/slurm ||
+	    echo -n
+	  """, shell = True)
+	subprocess.check_call("""
+	  [ ! -d /mnt/nfs/clust_scripts ] && mkdir -p /mnt/nfs/clust_scripts ||
+	    echo -n
+	  """, shell = True)
 
 	# Slurm conf. file cgroup.conf can be copied-as is (other conf. files will
 	# need editing below
 	subprocess.check_call(
 	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
-	  )
+	  ),
+	  shell = True
 	)
 
 	# scripts
 	subprocess.check_call(
-	  "cp {CPR}/src/* /mnt/nfs/clust_scripts".format(CPR = shlex.quote(CLUST_PROV_ROOT))
+	  "cp {CPR}/src/* /mnt/nfs/clust_scripts".format(CPR = shlex.quote(CLUST_PROV_ROOT)),
+	  shell = True
 	)
 
 	# TODO: copy the tool to run
