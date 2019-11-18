@@ -16,6 +16,19 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
    ```
    
    After we've cloned an image from this machine, we can go ahead and delete it.
+   
+0. Authenticate on base image
+
+   **TODO**: Is there some way to automate this with a web UI?
+
+   ```bash
+   gcloud auth login
+   sudo cp -r ~/.config/gcloud /etc/gcloud
+   ```
+   
+   Note that we copy the entire gcloud configuration to a non-user specific directory
+   so that running `gcloud` as root will work seamlessly, after setting environment
+   variable `CLOUDSDK_CONFIG=/etc/gcloud`.
 
 0. Set up dev environment
 
@@ -169,3 +182,9 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
     
      NB: we won't need to do this two-step procedure when the repo is public; this is just so
      that GitHub recognizes my personal ssh key.
+     
+   * Install necessary Python packages
+
+     ```bash
+     sudo pip3 install pandas canine
+     ```
