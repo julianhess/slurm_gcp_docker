@@ -25,6 +25,8 @@ if __name__ == "__main__":
 	                  else "/usr/local/share/cga_pipeline"
 	#TODO: check if this is indeed a valid path
 
+	os.putenv("CLOUDSDK_CONFIG", "/etc/gcloud")
+
 	#
 	# process command line arguments
 	argp = argparse.ArgumentParser()
