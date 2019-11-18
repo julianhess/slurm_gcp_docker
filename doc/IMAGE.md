@@ -128,7 +128,7 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
       
       This will install Slurm's daemons (`slurmctld`, `slurmd`, and `slurmdbd`) to
       `/usr/local/sbin`, and Slurm's client utilities (e.g., `sinfo`, `squeue`, etc.)
-      to `/usr/local/bin`/
+      to `/usr/local/bin`
 
 4. Post-install configuration
 
@@ -176,12 +176,8 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
    * Mirror this repo
       
      ```bash
-     git clone git@github.com:julianhess/cga_pipeline.git && \
-     sudo cp -r cga_pipeline /usr/local/share/
+     sudo git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline
      ```
-    
-     NB: we won't need to do this two-step procedure when the repo is public; this is just so
-     that GitHub recognizes my personal ssh key.
      
    * Install necessary Python packages
 
