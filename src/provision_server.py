@@ -90,7 +90,7 @@ if __name__ == "__main__":
 	C[["ControlMachine", "ControlAddr", "AccountingStorageHost", "SuspendExcNodes"]] = ctrl_hostname
 
 	C["NodeName"] = "NodeName={HN}-worker[1-2000] CPUs=8 RealMemory=28000 State=CLOUD".format(HN = ctrl_hostname)
-	C["PartitionName"] = "PartitionName=gce_cluster Nodes={HN}[1-2000] Default=YES MaxTime=INFINITE State=UP OverSubscribe=YES:10".format(HN = ctrl_hostname)
+	C["PartitionName"] = "PartitionName=gce_cluster Nodes={HN}-worker[1-2000] Default=YES MaxTime=INFINITE State=UP OverSubscribe=YES:10".format(HN = ctrl_hostname)
 
 	C.to_csv("/mnt/nfs/clust_conf/slurm/slurm.conf", sep = "=", header = False)
 
