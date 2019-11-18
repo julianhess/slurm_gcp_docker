@@ -44,9 +44,9 @@ if __name__ == "__main__":
 	# set up NFS
 	subprocess.check_call("{CPR}/src/nfs_provision_server.sh {disk_size} {disk_type}".format(
 	  CPR = shlex.quote(CLUST_PROV_ROOT),
-	  disk_size = shlex.quote(args.nfs_disk_size),
+	  disk_size = shlex.quote(str(args.nfs_disk_size)),
 	  disk_type = shlex.quote(args.nfs_disk_type)
-	))
+	), shell = True)
 
 	#
 	# copy common files to NFS
