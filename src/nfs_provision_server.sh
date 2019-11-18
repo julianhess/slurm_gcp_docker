@@ -50,7 +50,9 @@ sudo mount -o discard,defaults /dev/sdb /mnt/nfs
 
 #
 # add to exports; restart NFS server
-sudo tee -a /etc/exports <<< \
+
+# XXX: this will preclude any preexisting NFS mounts defined in the base image.
+sudo tee /etc/exports <<< \
 "/mnt/nfs ${HOSTNAME}-worker*(rw,async,no_subtree_check,insecure,no_root_squash)"
 
 sudo service nfs-kernel-server restart
