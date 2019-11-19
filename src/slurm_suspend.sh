@@ -1,9 +1,12 @@
 #!/bin/bash
 
+export SLURM_CONF=/mnt/nfs/clust_conf/slurm/slurm.conf
+export CLOUDSDK_CONFIG=/etc/gcloud
+
 # get zone of instance
-ZONE=$(gcloud compute instances list --filter="name=${HOSTNAME}" \
+ZONE=$(/snap/bin/gcloud compute instances list --filter="name=${HOSTNAME}" \
   --format='csv[no-heading](zone)')
 
 INST_LIST=$(scontrol show hostnames $@)
 
-gcloud compute instances stop $INST_LIST --zone $ZONE --quiet
+/snap/bin/gcloud compute instances stop $INST_LIST --zone $ZONE --quiet
