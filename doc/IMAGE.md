@@ -3,7 +3,7 @@
 All compute nodes (controller + workers) are spun up with an identical 
 image — whether they serve as a controller or worker depends on external inputs (provision script).
 
-This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are steps to build our cluster image from this bare image. In theory, all of these steps to can be done programatically; I just haven't created a script for it yet.
+This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are steps to build our cluster image from this bare image. To automatically create this image, run `src/generate_base_image.sh <name of image>`, which simply runs the commands in this document.
 
 ## Steps to generate image:
 
