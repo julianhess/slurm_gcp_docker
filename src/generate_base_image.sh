@@ -67,14 +67,20 @@ cd slurm-19.05.3-2 && \
   --with-mysql_config=/usr/bin --with-hdf5=no && \
 make && sudo make install && \
 sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 group_enable=memory swapaccount=1"\3/' /etc/default/grub && \
-sudo adduser --gecos "" --disabled-password slurm && sudo mkdir -p /var/spool/slurm && \
-sudo chown slurm:slurm /var/spool/slurm && \
+sudo adduser --gecos "" --disabled-password slurm && \
+sudo mkdir -p /var/spool/slurm && sudo chown slurm:slurm /var/spool/slurm && \
 sudo systemctl start mariadb && \
 sudo mysql -u root -e "create user 'slurm'@'localhost'" && \
 sudo mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';" && \
 sudo git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
-sudo pip3 install pandas canine
+sudo pip install pandas canine
 EOF
+
+#
+# shut down dummy instance
+# (this is to avoid disk caching problems that can arise from imaging a running
+# instance)
+gcloud compute instances stop $HOST --zone $ZONE --quiet
 
 #
 # clone base image from dummy host's drive
