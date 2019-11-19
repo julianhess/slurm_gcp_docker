@@ -94,3 +94,7 @@ echo "Deleting snapshot/template disk ..."
 gcloud compute disks delete ${HOST}-tmpdr --zone $ZONE --quiet || \
   { echo "Error deleting template disk!"; exit 1; }
 gcloud compute snapshots delete ${HOST}-snap --quiet || { echo "Error deleting snapshot!"; exit 1; }
+
+#
+# delete dummy host
+gcloud compute instances delete $HOST --zone $ZONE --quiet
