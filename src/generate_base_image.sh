@@ -5,6 +5,8 @@
 
 # TODO: add argument parsing (currently just falls back on defaults)
 
+set -e
+
 #
 # parse in zone, or use zone of current instance (if any)
 ZONE=$(gcloud compute instances list --filter="name=${HOSTNAME}" \
@@ -33,12 +35,23 @@ gcloud compute --project $PROJ instances create $HOST --zone $ZONE \
 --image-project ubuntu-os-cloud --boot-disk-size 10GB --boot-disk-type pd-standard
 
 #
-# interactively login to user's Google account
-gcloud compute ssh $HOST --zone $ZONE -- -t /snap/bin/gcloud auth login --no-launch-browser
+# wait for instance to be ready
+echo -n "Waiting for dummy instance to be ready ..."
+while ! gcloud compute ssh $HOST --zone $ZONE -- -o "UserKnownHostsFile /dev/null" \
+  -t echo &> /dev/null; do
+	sleep 1
+	echo -n ".";
+done
+echo
+
+#
+# interactively authorize user's Google account
+gcloud compute ssh $HOST --zone $ZONE -- -o "UserKnownHostsFile /dev/null" \
+  -t 'echo -n "Waiting for gcloud ..."; while [ ! -f /snap/bin/gcloud ]; do sleep 1; echo -n "."; done; echo; /snap/bin/gcloud auth login --no-launch-browser'
 
 #
 # build environment on dummy host
-ssh -o "StrictHostKeyChecking no" -T $HOST <<'EOF'
+ssh -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T $HOST <<'EOF'
 sudo cp -r ~/.config/gcloud /etc/gcloud && \
 sudo apt-get update && \
 sudo apt-get -y install build-essential vim git python3-pip nfs-kernel-server \
