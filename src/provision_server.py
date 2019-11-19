@@ -111,9 +111,11 @@ if __name__ == "__main__":
 	print("Checking for running Slurm controller ... ")
 
 	subprocess.check_call("""
-          export SLURM_CONF={conf_path} &&
-          pgrep slurmctld || slurmctld -c -f {conf_path} &&
-	  slurmctld reconfigure; pgrep slurmdbd || slurmdbd; pgrep munged || munged -f
+	  export SLURM_CONF={conf_path};
+	  pgrep slurmdbd || slurmdbd;
+	  pgrep slurmctld || slurmctld -c -f {conf_path} &&
+	    slurmctld reconfigure;
+	  pgrep munged || munged -f
 	  """.format(conf_path = "/mnt/nfs/clust_conf/slurm/slurm.conf"),
 	  shell = True,
 	  stdout = subprocess.DEVNULL
