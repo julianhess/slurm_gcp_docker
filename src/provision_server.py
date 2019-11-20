@@ -113,6 +113,7 @@ if __name__ == "__main__":
 	subprocess.check_call("""
 	  export SLURM_CONF={conf_path};
 	  pgrep slurmdbd || slurmdbd;
+	  sacctmgr -i add cluster cluster;
 	  pgrep slurmctld || slurmctld -c -f {conf_path} &&
 	    slurmctld reconfigure;
 	  pgrep munged || munged -f
