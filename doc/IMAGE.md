@@ -139,13 +139,16 @@ This image is based on GCE image **Ubuntu 19.10 minimal**.  The following are st
      
      ```bash
      sudo apt-get install ssed
-     sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 group_enable=memory swapaccount=1"\3/' /etc/default/grub
+     sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 cgroup_enable=memory swapaccount=1"\3/' /etc/default/grub
      ```
 
-   * Add slurm user
+   * Add slurm user (and give it its own gcloud credentials)
    
      ```bash
      sudo adduser --disabled-password slurm
+     sudo mkdir -p ~slurm/.config
+     sudo cp -r /etc/gcloud ~slurm/.config/gcloud
+     sudo chown -R slurm:slurm ~slurm/.config/gcloud
      ```
 
    * Add Slurm logging directory
