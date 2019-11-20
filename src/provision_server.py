@@ -113,7 +113,13 @@ if __name__ == "__main__":
 	subprocess.check_call("""
 	  export SLURM_CONF={conf_path};
 	  pgrep slurmdbd || slurmdbd;
-	  sacctmgr -i add cluster cluster;
+	  echo -n "Waiting for database to be ready ..."
+	  while ! sacctmgr -i list cluster; do
+	    sleep 1
+	    echo -n "."
+	  done
+	  echo
+	  sacctmgr -i add cluster cluster
 	  pgrep slurmctld || slurmctld -c -f {conf_path} &&
 	    slurmctld reconfigure;
 	  pgrep munged || munged -f
