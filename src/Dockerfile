@@ -7,7 +7,7 @@ COPY gc_conf /etc/gcloud
 RUN apt-get update && \
 apt-get -y install build-essential vim git python3-pip nfs-kernel-server \
   nfs-common portmap libmariadb-dev mariadb-client mariadb-server \
-  munge libmunge-dev libhwloc-dev cgroup-tools libreadline-dev ssed && \
+  munge libmunge-dev libhwloc-dev cgroup-tools libreadline-dev ssed wget && \
 ln -s /usr/bin/python3 /usr/bin/python && \
 ln -s /usr/bin/pip3 /usr/bin/pip && \
 mkdir -p /mnt/nfs && \
