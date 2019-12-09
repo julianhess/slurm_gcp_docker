@@ -2,8 +2,9 @@ FROM ubuntu:19.10
 
 WORKDIR /tmp
 
-RUN sudo cp -r ~/.config/gcloud /etc/gcloud && \
-sudo apt-get update && \
+COPY gc_conf /etc/gcloud
+
+RUN sudo apt-get update && \
 sudo apt-get -y install build-essential vim git python3-pip nfs-kernel-server \
   nfs-common portmap libmariadb-dev mariadb-client mariadb-server \
   munge libmunge-dev libhwloc-dev cgroup-tools libreadline-dev ssed && \
