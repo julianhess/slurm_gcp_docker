@@ -17,8 +17,6 @@ cd slurm-19.05.3-2 && \
 ./configure --prefix=/usr/local --sysconfdir=/usr/local/etc \
   --with-mysql_config=/usr/bin --with-hdf5=no && \
 make && make install && \
-ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 cgroup_enable=memory swapaccount=1"\3/' /etc/default/grub && \
-update-grub && \
 adduser --gecos "" --disabled-password slurm && \
 mkdir -p ~slurm/.config && cp -r /etc/gcloud ~slurm/.config/gcloud && \
 chown -R slurm:slurm ~slurm/.config/gcloud && \
