@@ -2,8 +2,10 @@ FROM ubuntu:19.10
 
 WORKDIR /tmp
 
+# copy in gcloud config from host's build directory
 COPY gc_conf /etc/gcloud
 
+# install Slurm/MySQL/NFS/cluster scripts
 RUN apt-get update && \
 apt-get -y install build-essential vim git python3-pip nfs-kernel-server \
   nfs-common portmap libmariadb-dev mariadb-client mariadb-server \
@@ -27,3 +29,10 @@ mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';" && \
 git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
 pip install pandas canine
 
+# install gcloud 
+RUN wget -O gcs.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-272.0.0-linux-x86_64.tar.gz && \
+tar xzf gcs.tgz -C /root && \
+/root/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet
+
+# clean up /tmp
+RUN rm -rf *
