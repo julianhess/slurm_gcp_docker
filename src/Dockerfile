@@ -23,7 +23,8 @@ adduser --gecos "" --disabled-password slurm && \
 mkdir -p ~slurm/.config && cp -r /etc/gcloud ~slurm/.config/gcloud && \
 chown -R slurm:slurm ~slurm/.config/gcloud && \
 mkdir -p /var/spool/slurm && chown slurm:slurm /var/spool/slurm && \
-mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld && (mysqld &) && \
+mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld && \
+(mysqld & while ! mysqladmin -s status; do sleep 1; done ) && \
 mysql -u root -e "create user 'slurm'@'localhost'" && \
 mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';" && \
 git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
