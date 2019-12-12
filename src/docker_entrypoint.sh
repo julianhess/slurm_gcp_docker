@@ -4,4 +4,5 @@
 sudo service rpcbind restart
 
 mysqld &
-/usr/local/share/cga_pipeline/src/provision_server.py
+cd /usr/local/share/cga_pipeline/src
+./provision_server.py
