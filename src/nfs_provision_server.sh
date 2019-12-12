@@ -8,7 +8,7 @@ set -e -o pipefail
 #
 # parse arguments; create, attach, format, and mount NFS disk (if these things
 # have not yet already been done)
-. make_nfs_disk.sh
+. nfs_make_disk.sh
 
 #
 # add to exports; restart NFS server
