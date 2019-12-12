@@ -2,9 +2,6 @@
 
 set -e
 
-/usr/local/share/cga_pipeline/src/nfs_provision_worker.sh $1
+/usr/local/share/cga_pipeline/src/nfs_provision_worker.sh ${1}-nfs
 
-export SLURM_CONF=/mnt/nfs/clust_conf/slurm/slurm.conf
-
-sudo munged -f
-sudo -E slurmd -f /mnt/nfs/clust_conf/slurm/slurm.conf
+. /usr/local/share/cga_pipeline/src/slurm_start.sh

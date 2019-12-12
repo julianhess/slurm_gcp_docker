@@ -30,29 +30,13 @@ if __name__ == "__main__":
 	                  else "/usr/local/share/cga_pipeline"
 	#TODO: check if this is indeed a valid path
 
-	os.putenv("CLOUDSDK_CONFIG", "/etc/gcloud")
+	ctrl_hostname = socket.gethostname()
 
 	#
-	# process command line arguments
-	argp = argparse.ArgumentParser()
-
-	# NFS disk size
-	argp.add_argument('--nfs_disk_size', '-s', type = int, default = 100)
-
-	# NFS disk type
-	argp.add_argument(
-	  '--nfs_disk_type', '-t', type = str, choices = ['pd-standard', 'pd-ssd'], 
-	  default = 'pd-standard'
-	)
-
-	args = argp.parse_args()
-
-	#
-	# set up NFS
-	subprocess.check_call("{CPR}/src/nfs_provision_server.sh {disk_size} {disk_type}".format(
+	# mount NFS server
+	subprocess.check_call("{CPR}/src/nfs_provision_worker.sh {HN}-nfs".format(
 	  CPR = shlex.quote(CLUST_PROV_ROOT),
-	  disk_size = shlex.quote(str(args.nfs_disk_size)),
-	  disk_type = shlex.quote(args.nfs_disk_type)
+	  HN = ctrl_hostname
 	), shell = True)
 
 	#
@@ -69,7 +53,7 @@ if __name__ == "__main__":
 	  """, shell = True)
 
 	# Slurm conf. file cgroup.conf can be copied-as is (other conf. files will
-	# need editing below
+	# need editing below)
 	subprocess.check_call(
 	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
@@ -87,12 +71,12 @@ if __name__ == "__main__":
 
 	#
 	# setup Slurm config files
-	ctrl_hostname = socket.gethostname()
 
 	#
 	# slurm.conf
 	C = parse_slurm_conf("{CPR}/conf/slurm.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
-	C[["ControlMachine", "ControlAddr", "AccountingStorageHost", "SuspendExcNodes"]] = ctrl_hostname
+	C[["ControlMachine", "ControlAddr", "AccountingStorageHost"]] = ctrl_hostname
+	#C["SuspendExcNodes"] = ctrl_hostname + "-nfs"
 
 	C["NodeName"] = "{HN}-worker[1-2000] CPUs=8 RealMemory=28000 State=CLOUD".format(HN = ctrl_hostname)
 	C["PartitionName"] = "gce_cluster Nodes={HN}-worker[1-2000] Default=YES MaxTime=INFINITE State=UP OverSubscribe=YES:10".format(HN = ctrl_hostname)
@@ -114,7 +98,7 @@ if __name__ == "__main__":
 	  export SLURM_CONF={conf_path};
 	  pgrep slurmdbd || slurmdbd;
 	  echo -n "Waiting for database to be ready ..."
-	  while ! sacctmgr -i list cluster; do
+	  while ! sacctmgr -i list cluster &> /dev/null; do
 	    sleep 1
 	    echo -n "."
 	  done
