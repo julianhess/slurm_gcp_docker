@@ -11,7 +11,7 @@ COPY gc_conf /etc/gcloud
 
 # 1. prereqs from apt
 RUN apt-get update && \
-apt-get -y install build-essential vim git python3-pip nfs-kernel-server \
+apt-get -y install build-essential vim git python3-pip \
   nfs-common portmap libmariadb-dev mariadb-client mariadb-server \
   munge libmunge-dev libhwloc-dev cgroup-tools libreadline-dev ssed wget sudo
 
