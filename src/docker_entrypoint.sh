@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ~/.bashrc
+
 [ ! -d /run/sendsigs.omit.d ] && sudo mkdir -p /run/sendsigs.omit.d
 sudo service rpcbind restart
 
