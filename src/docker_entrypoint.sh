@@ -2,8 +2,10 @@
 
 . /root/google-cloud-sdk/path.bash.inc
 
-[ ! -d /run/sendsigs.omit.d ] && sudo mkdir -p /run/sendsigs.omit.d
-sudo service rpcbind restart
+[ ! -d /run/sendsigs.omit.d ] && mkdir -p /run/sendsigs.omit.d
+service rpcbind restart
+
+[ ! -d /run/munge ] && mkdir -p /run/munge
 
 mysqld &
 cd /usr/local/share/cga_pipeline/src
