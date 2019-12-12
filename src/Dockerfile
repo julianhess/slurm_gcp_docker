@@ -55,3 +55,7 @@ tar xzf gcs.tgz -C /root && \
 #
 # clean up /tmp
 RUN rm -rf *
+
+#
+# set entrypoint
+ENTRYPOINT /usr/local/share/cga_pipeline/src/docker_entrypoint.sh

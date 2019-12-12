@@ -17,8 +17,5 @@ set -e -o pipefail
 sudo tee /etc/exports > /dev/null <<< \
 "/mnt/nfs ${HOSTNAME}-worker*(rw,async,no_subtree_check,insecure,no_root_squash)"
 
-[ ! -d /run/sendsigs.omit.d ] && sudo mkdir -p /run/sendsigs.omit.d
-sudo service rpcbind restart
-
 sudo service nfs-kernel-server restart
 sudo exportfs -ra
