@@ -5,4 +5,4 @@
 # been done)
 . nfs_make_disk.sh
 
-sudo docker run --rm --network host -ti --name "pype_host" broadinstitute/pydpiper /bin/bash
+sudo docker run --privileged --rm --network host -ti -v /mnt/nfs:/mnt/nfs --name "pype_host" broadinstitute/pydpiper /bin/bash
