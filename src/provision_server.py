@@ -50,11 +50,11 @@ if __name__ == "__main__":
 	subprocess.check_call("""
 	  [ ! -d /mnt/nfs/clust_conf/slurm ] && mkdir -p /mnt/nfs/clust_conf/slurm ||
 	    echo -n
-	  """, shell = True)
+	  """, shell = True, executable = '/bin/bash')
 	subprocess.check_call("""
 	  [ ! -d /mnt/nfs/clust_scripts ] && mkdir -p /mnt/nfs/clust_scripts ||
 	    echo -n
-	  """, shell = True)
+	  """, shell = True, executable = '/bin/bash')
 
 	# Slurm conf. file cgroup.conf can be copied-as is (other conf. files will
 	# need editing below)
@@ -110,6 +110,12 @@ if __name__ == "__main__":
 	print("Checking for running Slurm controller ... ")
 
 	subprocess.check_call("""
+	  echo -n "Waiting for Slurm conf ..."
+	  while [ ! -f {conf_path} ]; do
+	    sleep 1
+	    echo -n "."
+	  done
+	  echo
 	  export SLURM_CONF={conf_path};
 	  pgrep slurmdbd || slurmdbd;
 	  echo -n "Waiting for database to be ready ..."
@@ -124,5 +130,6 @@ if __name__ == "__main__":
 	  pgrep munged || munged -f
 	  """.format(conf_path = "/mnt/nfs/clust_conf/slurm/slurm.conf"),
 	  shell = True,
-	  stdout = subprocess.DEVNULL
+	  stderr = subprocess.DEVNULL,
+	  executable = '/bin/bash'
 	)
