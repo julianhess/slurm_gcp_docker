@@ -34,7 +34,10 @@ echo -e "Creating NFS disk ...\n"
 gcloud compute disks list --filter="name=${HOSTNAME}-nfs" --format='csv[no-heading](type)' | \
   grep -q $DISKTYPE || \
   gcloud compute disks create ${HOSTNAME}-nfs --size ${SIZE}GB --type $DISKTYPE --zone $ZONE
-[ -b /dev/disk/by-id/google-${HOSTNAME}-nfs ] || \
+[ -b /dev/disk/by-id/google-${HOSTNAME}-nfs ] && \
+  { echo "Disk is already attached!";
+    sudo mount -o discard,defaults /dev/sdb /mnt/nfs;
+  } || \
   { gcloud compute instances attach-disk $HOSTNAME --disk ${HOSTNAME}-nfs --zone $ZONE \
       --device-name ${HOSTNAME}-nfs && \
     gcloud compute instances set-disk-auto-delete $HOSTNAME --disk ${HOSTNAME}-nfs \
