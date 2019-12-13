@@ -78,6 +78,7 @@ sudo adduser -u 1337 --gecos "" --disabled-password slurm && \
 sudo mkdir -p ~slurm/.config && sudo cp -r /etc/gcloud ~slurm/.config/gcloud && \
 sudo chown -R slurm:slurm ~slurm/.config/gcloud && \
 sudo mkdir -p /var/spool/slurm && sudo chown slurm:slurm /var/spool/slurm && \
+sudo dd if=/dev/zero bs=1 count=1024 of=/etc/munge/munge.key && \
 sudo systemctl start mariadb && \
 sudo mysql -u root -e "create user 'slurm'@'localhost'" && \
 sudo mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';" && \

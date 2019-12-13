@@ -40,17 +40,20 @@ RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld && \
 mysql -u root -e "create user 'slurm'@'localhost'" && \
 mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';"
 
-# 6. Python prereqs
+# 6. set up munge
+RUN dd if=/dev/zero bs=1 count=1024 of=/etc/munge/munge.key
+
+# 7. Python prereqs
 RUN pip install pandas canine
 
-# 7. install gcloud 
+# 8. install gcloud
 RUN mkdir -p /snap/bin && \
 wget -O gcs.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-272.0.0-linux-x86_64.tar.gz && \
 tar xzf gcs.tgz -C /snap && \
 /snap/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet && \
 ln -s /snap/google-cloud-sdk/bin/* /snap/bin
 
-# 8. get cluster utility scripts
+# 9. get cluster utility scripts
 RUN git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline
 
 #
