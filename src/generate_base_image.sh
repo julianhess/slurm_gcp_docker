@@ -56,7 +56,13 @@ sudo cp -r ~/.config/gcloud /etc/gcloud && \
 sudo apt-get update && \
 sudo apt-get -y install build-essential vim git python3-pip nfs-kernel-server \
   nfs-common portmap libmariadb-dev mariadb-client mariadb-server \
-  munge libmunge-dev libhwloc-dev cgroup-tools libreadline-dev ssed && \
+  munge libmunge-dev libhwloc-dev cgroup-tools libreadline-dev ssed iptables && \
+wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/containerd.io_1.2.6-3_amd64.deb" && \
+wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
+wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
+sudo dpkg -i "containerd.io_1.2.6-3_amd64.deb" && \
+sudo dpkg -i "docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
+sudo dpkg -i "docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
 sudo ln -s /usr/bin/python3 /usr/bin/python && \
 sudo ln -s /usr/bin/pip3 /usr/bin/pip && \
 sudo mkdir -p /mnt/nfs && \
