@@ -4,6 +4,7 @@ import argparse
 import io
 import os
 import pandas as pd
+import re
 import shlex
 import socket
 import subprocess
@@ -23,7 +24,10 @@ def parse_slurm_conf(path):
 def print_conf(D, path):
 	with open(path, "w") as f:
 		for r in D.iteritems():
-			f.write("{k}={v}\n".format(k = r[0], v = r[1]))
+			f.write("{k}={v}\n".format(
+			  k = re.sub(r"^(NodeName|Partition)\d+$", r"\1", r[0]),
+			  v = r[1]
+			))
 
 if __name__ == "__main__":
 	CLUST_PROV_ROOT = os.environ["CLUST_PROV_ROOT"] if "CLUST_PROV_ROOT" in os.environ \
@@ -76,10 +80,21 @@ if __name__ == "__main__":
 	# slurm.conf
 	C = parse_slurm_conf("{CPR}/conf/slurm.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
 	C[["ControlMachine", "ControlAddr", "AccountingStorageHost"]] = ctrl_hostname
-	#C["SuspendExcNodes"] = ctrl_hostname + "-nfs"
+	C["SuspendExcNodes"] = ctrl_hostname + "-nfs"
 
-	C["NodeName"] = "{HN}-worker[1-2000] CPUs=8 RealMemory=28000 State=CLOUD".format(HN = ctrl_hostname)
-	C["PartitionName"] = "gce_cluster Nodes={HN}-worker[1-2000] Default=YES MaxTime=INFINITE State=UP OverSubscribe=YES:10".format(HN = ctrl_hostname)
+	# node definitions
+	C["NodeName8"] = "{HN}-worker[1-100] CPUs=8 RealMemory=28000 State=CLOUD".format(HN = ctrl_hostname)
+	C["NodeName1"] = "{HN}-worker[101-2000] CPUs=1 RealMemory=3000 State=CLOUD".format(HN = ctrl_hostname)
+	C["NodeName4"] = "{HN}-worker[2001-3000] CPUs=4 RealMemory=23000 State=CLOUD".format(HN = ctrl_hostname)
+	C["NodeName99"] = "{HN}-nfs CPUs=4 RealMemory=14000 State=CLOUD".format(HN = ctrl_hostname)
+
+	# partition definitions
+	# TODO: do we still need to oversubscribe?
+	C["PartitionName"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
+	C["PartitionName8"] = "8core Nodes={HN}-worker[1-100] MaxTime=INFINITE State=UP OverSubscribe=YES:8".format(HN = ctrl_hostname)
+	C["PartitionName1"] = "1core Nodes={HN}-worker[101-2000] Default=YES".format(HN = ctrl_hostname)
+	C["PartitionName4"] = "4corehimem Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
+	C["PartitionName99"] = "nfs Nodes={HN}-nfs".format(HN = ctrl_hostname)
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
