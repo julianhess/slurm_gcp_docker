@@ -90,11 +90,11 @@ if __name__ == "__main__":
 
 	# partition definitions
 	# TODO: do we still need to oversubscribe?
-	C["PartitionName"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
-	C["PartitionName8"] = "8core Nodes={HN}-worker[1-100] MaxTime=INFINITE State=UP OverSubscribe=YES:8".format(HN = ctrl_hostname)
-	C["PartitionName1"] = "1core Nodes={HN}-worker[101-2000] Default=YES".format(HN = ctrl_hostname)
-	C["PartitionName4"] = "4corehimem Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
-	C["PartitionName99"] = "nfs Nodes={HN}-nfs".format(HN = ctrl_hostname)
+	C["Partition"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
+	C["Partition8"] = "8core Nodes={HN}-worker[1-100] MaxTime=INFINITE State=UP OverSubscribe=YES:8".format(HN = ctrl_hostname)
+	C["Partition1"] = "1core Nodes={HN}-worker[101-2000] Default=YES".format(HN = ctrl_hostname)
+	C["Partition4"] = "4corehimem Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
+	C["Partition99"] = "nfs Nodes={HN}-nfs".format(HN = ctrl_hostname)
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
