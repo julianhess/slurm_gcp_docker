@@ -76,7 +76,8 @@ sudo systemctl start mariadb && \
 sudo mysql -u root -e "create user 'slurm'@'localhost'" && \
 sudo mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';" && \
 sudo git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
-sudo pip install pandas canine
+sudo pip install pandas canine && \
+rm -rf ~/*
 EOF
 
 #
