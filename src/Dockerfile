@@ -29,7 +29,7 @@ cd slurm-19.05.3-2 && \
 make && make install
 
 # 4. make Slurm directories
-RUN adduser --gecos "" --disabled-password slurm && \
+RUN adduser -u 1337 --gecos "" --disabled-password slurm && \
 mkdir -p ~slurm/.config && cp -r /etc/gcloud ~slurm/.config/gcloud && \
 chown -R slurm:slurm ~slurm/.config/gcloud && \
 mkdir -p /var/spool/slurm && chown slurm:slurm /var/spool/slurm
