@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get -y install nfs-common portmap
+sudo apt-get -y install nfs-common
 
 # TODO: implement a better check for whether gcloud is properly configured
 #       simply checking for the existence of ~/.config/gcloud is insufficient
