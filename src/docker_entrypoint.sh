@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /root/google-cloud-sdk/path.bash.inc
+. /gcsdk/google-cloud-sdk/path.bash.inc
 
 [ ! -d /run/munge ] && mkdir -p /run/munge
 

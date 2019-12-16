@@ -53,7 +53,7 @@ tar xzf gcs.tgz -C /gcsdk && \
 ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 
 # 10. get cluster utility scripts
-ARG cache_invalidate=1
+ARG cache_invalidate=2
 RUN git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline
 
 #
