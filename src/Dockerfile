@@ -54,6 +54,7 @@ tar xzf gcs.tgz -C /snap && \
 ln -s /snap/google-cloud-sdk/bin/* /snap/bin
 
 # 9. get cluster utility scripts
+ARG cache_invalidate=1
 RUN git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline
 
 #
