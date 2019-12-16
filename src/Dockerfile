@@ -45,12 +45,12 @@ RUN dd if=/dev/zero bs=1 count=1024 of=/etc/munge/munge.key
 # 8. Python prereqs
 RUN pip install pandas canine
 
-RUN mkdir -p /snap/bin && \
 # 9. install gcloud
+RUN mkdir /gcsdk && \
 wget -O gcs.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-272.0.0-linux-x86_64.tar.gz && \
-tar xzf gcs.tgz -C /snap && \
-/snap/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet && \
-ln -s /snap/google-cloud-sdk/bin/* /snap/bin
+tar xzf gcs.tgz -C /gcsdk && \
+/gcsdk/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet && \
+ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 
 # 10. get cluster utility scripts
 ARG cache_invalidate=1

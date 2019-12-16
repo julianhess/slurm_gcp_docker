@@ -82,6 +82,11 @@ sudo dd if=/dev/zero bs=1 count=1024 of=/etc/munge/munge.key && \
 sudo systemctl start mariadb && \
 sudo mysql -u root -e "create user 'slurm'@'localhost'" && \
 sudo mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';" && \
+sudo mkdir /gcsdk && \
+sudo wget -O gcs.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-272.0.0-linux-x86_64.tar.gz && \
+sudo tar xzf gcs.tgz -C /gcsdk && \
+sudo /gcsdk/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet && \
+sudo ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin && \
 sudo git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
 sudo pip install pandas canine && \
 rm -rf ~/*
