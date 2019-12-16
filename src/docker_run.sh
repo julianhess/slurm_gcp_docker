@@ -11,4 +11,4 @@ pgrep munged &> /dev/null && { echo -e "Munge is already running on this machine
 # TODO: update path to setup script in error message
 mountpoint -q /mnt/nfs || { echo "NFS is not mounted. Please run <setup script> again."; exit 1; }
 
-sudo docker run --privileged --rm --network host -ti --name "pype_host" broadinstitute/pydpiper /bin/bash
+sudo docker run -v /mnt/nfs:/mnt/nfs --rm --network host -ti --name "pype_host" broadinstitute/pydpiper /bin/bash
