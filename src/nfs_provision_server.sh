@@ -23,33 +23,24 @@ case "$DISKTYPE" in
 esac
 
 #
-# wait for gcloud to be available
-echo -n "Waiting for gcloud ..."
-while [ ! -f /snap/bin/gcloud ]; do
-	echo -n "."
-	sleep 1
-done
-echo
-
-#
 # get zone of instance
-ZONE=$(/snap/bin/gcloud compute instances list --filter="name=${HOSTNAME}" \
+ZONE=$(gcloud compute instances list --filter="name=${HOSTNAME}" \
   --format='csv[no-heading](zone)')
 
 #
 # create and attach NFS disk (if it does not already exist)
 echo -e "Creating NFS disk ...\n"
 
-/snap/bin/gcloud compute disks list --filter="name=${HOSTNAME}-nfs" --format='csv[no-heading](type)' | \
+gcloud compute disks list --filter="name=${HOSTNAME}-nfs" --format='csv[no-heading](type)' | \
   grep -q $DISKTYPE || \
-  /snap/bin/gcloud compute disks create ${HOSTNAME}-nfs --size ${SIZE}GB --type $DISKTYPE --zone $ZONE
+  gcloud compute disks create ${HOSTNAME}-nfs --size ${SIZE}GB --type $DISKTYPE --zone $ZONE
 [ -b /dev/disk/by-id/google-${HOSTNAME}-nfs ] && \
   { echo "Disk is already attached!";
     sudo mount -o discard,defaults /dev/sdb /mnt/nfs;
   } || \
-  { /snap/bin/gcloud compute instances attach-disk $HOSTNAME --disk ${HOSTNAME}-nfs --zone $ZONE \
+  { gcloud compute instances attach-disk $HOSTNAME --disk ${HOSTNAME}-nfs --zone $ZONE \
       --device-name ${HOSTNAME}-nfs && \
-    /snap/bin/gcloud compute instances set-disk-auto-delete $HOSTNAME --disk ${HOSTNAME}-nfs \
+    gcloud compute instances set-disk-auto-delete $HOSTNAME --disk ${HOSTNAME}-nfs \
       --zone $ZONE; }
 
 #
