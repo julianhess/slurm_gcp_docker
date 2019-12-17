@@ -109,7 +109,7 @@ gcloud compute disks create ${HOST}-tmpdr --source-snapshot=${HOST}-snap --size 
   --zone $ZONE || { echo "Error creating template disk!"; exit 1; }
 
 echo "Creating image from template disk ..."
-gcloud compute images create $IMAGENAME --source-disk=${HOST}-tmpdr --source-disk-zone $ZONE || \
+gcloud compute images create $IMAGENAME --source-disk=${HOST}-tmpdr --source-disk-zone $ZONE --family pydpiper || \
   { echo "Error creating image!"; exit 1; }
 
 echo "Deleting snapshot/template disk ..."
