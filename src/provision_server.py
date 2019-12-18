@@ -86,7 +86,7 @@ if __name__ == "__main__":
 	C["NodeName8"] = "{HN}-worker[1-100] CPUs=8 RealMemory=28000 State=CLOUD".format(HN = ctrl_hostname)
 	C["NodeName1"] = "{HN}-worker[101-2000] CPUs=1 RealMemory=3000 State=CLOUD".format(HN = ctrl_hostname)
 	C["NodeName4"] = "{HN}-worker[2001-3000] CPUs=4 RealMemory=23000 State=CLOUD".format(HN = ctrl_hostname)
-	C["NodeName99"] = "{HN}-nfs CPUs=4 RealMemory=14000 State=CLOUD".format(HN = ctrl_hostname)
+	C["NodeName99"] = "{HN}-nfs CPUs=4 RealMemory=14000".format(HN = ctrl_hostname)
 
 	# partition definitions
 	C["PartitionName"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
