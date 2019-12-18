@@ -8,6 +8,8 @@ import re
 import shlex
 import socket
 import subprocess
+sys.path.append("/home/jhess/j/proj/") # TODO: remove this line when Capy is a package
+from capy import txt
 
 def parse_slurm_conf(path):
 	output = io.StringIO()
@@ -103,6 +105,22 @@ if __name__ == "__main__":
 	C["DbdHost"] = ctrl_hostname
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurmdbd.conf")
+
+	#
+	# save node lookup table
+	parts = C.filter(regex = r"^Partition").apply(lambda x : x.split(" "))
+	parts = pd.DataFrame(
+	  [{ "partition" : x[0], **{y[0] : y[1] for y in [z.split("=") for z in x[1:]]}} for x in parts]
+	)
+	parts = txt.parsein(parts, "Nodes", r"(.*)\[(\d+)-(\d+)\]", ["prefix", "start", "end"])
+	parts = parts.loc[~parts["start"].isna()].astype({ "start" : int, "end" : int })
+
+	nodes = []
+	for part in parts.itertuples():
+		nodes.append(pd.DataFrame([[part.partition, part.prefix + str(x)] for x in range(part.start, part.end + 1)], columns = ["machine_type", "idx"]))
+	nodes = pd.concat(nodes).set_index("idx")
+
+	nodes.to_pickle("/mnt/nfs/clust_conf/slurm/host_LuT.pickle")
 
 	#
 	# start Slurm controller
