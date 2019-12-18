@@ -90,9 +90,9 @@ if __name__ == "__main__":
 
 	# partition definitions
 	C["PartitionName"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
-	C["PartitionName8"] = "8core Nodes={HN}-worker[1-100]".format(HN = ctrl_hostname)
-	C["PartitionName1"] = "1core Nodes={HN}-worker[101-2000]".format(HN = ctrl_hostname)
-	C["PartitionName4"] = "4corehimem Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
+	C["PartitionName8"] = "n1-standard-8 Nodes={HN}-worker[1-100]".format(HN = ctrl_hostname)
+	C["PartitionName1"] = "n1-standard-1 Nodes={HN}-worker[101-2000]".format(HN = ctrl_hostname)
+	C["PartitionName4"] = "n1-highmem-4 Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
 	C["PartitionName99"] = "nfs Nodes={HN}-nfs DEFAULT=YES".format(HN = ctrl_hostname)
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
