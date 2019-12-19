@@ -58,7 +58,8 @@ echo -e "\nMounting disk ...\n"
 
 # this should already be present, but let's do this just in case
 [ ! -d /mnt/nfs ] && sudo mkdir -p /mnt/nfs
-sudo mount -o discard,defaults /dev/sdb /mnt/nfs;
+sudo mount -o discard,defaults /dev/sdb /mnt/nfs
+sudo chmod 777 /mnt/nfs;
 }
 
 #
