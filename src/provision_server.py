@@ -63,6 +63,10 @@ if __name__ == "__main__":
 	    echo -n
 	  """, shell = True, executable = '/bin/bash')
 	subprocess.check_call("""
+	  [ ! -d /mnt/nfs/clust_conf/canine ] && mkdir -p /mnt/nfs/clust_conf/canine ||
+	    echo -n
+	  """, shell = True, executable = '/bin/bash')
+	subprocess.check_call("""
 	  [ ! -d /mnt/nfs/clust_scripts ] && mkdir -p /mnt/nfs/clust_scripts ||
 	    echo -n
 	  """, shell = True, executable = '/bin/bash')
