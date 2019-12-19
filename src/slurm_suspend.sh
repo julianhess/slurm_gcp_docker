@@ -9,4 +9,4 @@ ZONE=$(gcloud compute instances list --filter="name=${HOSTNAME}" \
 
 INST_LIST=$(scontrol show hostnames $@)
 
-gcloud compute instances stop $INST_LIST --zone $ZONE --quiet
+gcloud compute instances delete $INST_LIST --zone $ZONE --quiet
