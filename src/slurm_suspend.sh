@@ -9,4 +9,6 @@ ZONE=$(gcloud compute instances list --filter="name=${HOSTNAME}" \
 
 INST_LIST=$(scontrol show hostnames $@)
 
-gcloud compute instances delete $INST_LIST --zone $ZONE --quiet
+# XXX: gcloud assumes that sys.stdin will always be not None, so we need to pass
+#      dummy stdin (/dev/null)
+gcloud compute instances delete $INST_LIST --zone $ZONE --quiet < /dev/null
