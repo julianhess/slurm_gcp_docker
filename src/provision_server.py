@@ -109,13 +109,6 @@ if __name__ == "__main__":
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
 	#
-	# slurmdbd.conf
-	C = parse_slurm_conf("{CPR}/conf/slurmdbd.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
-	C["DbdHost"] = ctrl_hostname
-
-	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurmdbd.conf")
-
-	#
 	# save node lookup table
 	parts = C.filter(regex = r"^Partition").apply(lambda x : x.split(" "))
 	parts = pd.DataFrame(
@@ -130,6 +123,13 @@ if __name__ == "__main__":
 	nodes = pd.concat(nodes).set_index("idx")
 
 	nodes.to_pickle("/mnt/nfs/clust_conf/slurm/host_LuT.pickle")
+
+	#
+	# slurmdbd.conf
+	C = parse_slurm_conf("{CPR}/conf/slurmdbd.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
+	C["DbdHost"] = ctrl_hostname
+
+	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurmdbd.conf")
 
 	#
 	# start Slurm controller
