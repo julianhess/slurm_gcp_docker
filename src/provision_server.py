@@ -8,8 +8,8 @@ import re
 import shlex
 import socket
 import subprocess
-sys.path.append("/home/jhess/j/proj/") # TODO: remove this line when Capy is a package
-from capy import txt
+# sys.path.append("/home/jhess/j/proj/") # TODO: remove this line when Capy is a package
+# from capy import txt
 
 def parse_slurm_conf(path):
 	output = io.StringIO()
@@ -22,6 +22,15 @@ def parse_slurm_conf(path):
 	output.seek(0)
 
 	return pd.read_csv(output, sep = "=", comment = "#", names = ["key", "value"], index_col = 0, squeeze = True)
+
+# TODO: package Capy so that we don't have to directly source these here
+def parsein(X, col, regex, fields):
+	T = parse(X[col], regex, fields)
+	return pd.concat([X, T], 1)
+
+def parse(X, regex, fields):
+	T = X.str.extract(regex).rename(columns = dict(zip(range(0, len(fields)), fields)));
+	return T
 
 def print_conf(D, path):
 	with open(path, "w") as f:
@@ -112,7 +121,7 @@ if __name__ == "__main__":
 	parts = pd.DataFrame(
 	  [{ "partition" : x[0], **{y[0] : y[1] for y in [z.split("=") for z in x[1:]]}} for x in parts]
 	)
-	parts = txt.parsein(parts, "Nodes", r"(.*)\[(\d+)-(\d+)\]", ["prefix", "start", "end"])
+	parts = parsein(parts, "Nodes", r"(.*)\[(\d+)-(\d+)\]", ["prefix", "start", "end"])
 	parts = parts.loc[~parts["start"].isna()].astype({ "start" : int, "end" : int })
 
 	nodes = []
