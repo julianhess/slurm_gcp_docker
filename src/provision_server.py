@@ -98,17 +98,18 @@ if __name__ == "__main__":
 	C["SuspendExcNodes"] = ctrl_hostname + "-nfs"
 
 	# node definitions
-	C["NodeName8"] = "{HN}-worker[1-100] CPUs=8 RealMemory=28000 State=CLOUD".format(HN = ctrl_hostname)
-	C["NodeName1"] = "{HN}-worker[101-2000] CPUs=1 RealMemory=3000 State=CLOUD".format(HN = ctrl_hostname)
-	C["NodeName4"] = "{HN}-worker[2001-3000] CPUs=4 RealMemory=23000 State=CLOUD".format(HN = ctrl_hostname)
-	C["NodeName99"] = "{HN}-nfs CPUs=4 RealMemory=14000".format(HN = ctrl_hostname)
+	C["NodeName8"] = "{HN}-worker[1-100] CPUs=8 RealMemory=28000 State=CLOUD Weight=3".format(HN = ctrl_hostname)
+	C["NodeName1"] = "{HN}-worker[101-2000] CPUs=1 RealMemory=3000 State=CLOUD Weight=2".format(HN = ctrl_hostname)
+	C["NodeName4"] = "{HN}-worker[2001-3000] CPUs=4 RealMemory=23000 State=CLOUD Weight=4".format(HN = ctrl_hostname)
+	C["NodeName99"] = "{HN}-nfs CPUs=4 RealMemory=14000 Weight=1".format(HN = ctrl_hostname)
 
 	# partition definitions
 	C["PartitionName"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
 	C["PartitionName8"] = "n1-standard-8 Nodes={HN}-worker[1-100]".format(HN = ctrl_hostname)
 	C["PartitionName1"] = "n1-standard-1 Nodes={HN}-worker[101-2000]".format(HN = ctrl_hostname)
 	C["PartitionName4"] = "n1-highmem-4 Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
-	C["PartitionName99"] = "nfs Nodes={HN}-nfs DEFAULT=YES".format(HN = ctrl_hostname)
+	C["PartitionName99"] = "nfs Nodes={HN}-nfs".format(HN = ctrl_hostname)
+	C["PartitionName999"] = "all Nodes={HN}-nfs,{HN}-worker[1-3000] Default=YES".format(HN = ctrl_hostname)
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
@@ -119,7 +120,7 @@ if __name__ == "__main__":
 	  [{ "partition" : x[0], **{y[0] : y[1] for y in [z.split("=") for z in x[1:]]}} for x in parts]
 	)
 	parts = parsein(parts, "Nodes", r"(.*)\[(\d+)-(\d+)\]", ["prefix", "start", "end"])
-	parts = parts.loc[~parts["start"].isna()].astype({ "start" : int, "end" : int })
+	parts = parts.loc[~parts["start"].isna() & (parts["partition"] != "all")].astype({ "start" : int, "end" : int })
 
 	nodes = []
 	for part in parts.itertuples():
