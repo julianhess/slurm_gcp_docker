@@ -59,8 +59,10 @@ RUN git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cg
 # 11. add current user to container; enable passwordless sudo
 ARG UID
 ARG USER
-RUN adduser -u $UID --gecos "" --disabled-password $USER && adduser $USER sudo
-RUN ssed -i '/^%sudo/s/ALL$/NOPASSWD:ALL/' /etc/sudoers
+RUN adduser -u $UID --gecos "" --disabled-password $USER && adduser $USER sudo && \
+HOMEDIR=`eval echo ~$USER` && mkdir -p $HOMEDIR/.config && \
+cp -r /etc/gcloud $HOMEDIR/.config/gcloud && chown -R $USER:$USER $HOMEDIR/.config/ && \
+ssed -i '/^%sudo/s/ALL$/NOPASSWD:ALL/' /etc/sudoers
 
 #
 # clean up /tmp
