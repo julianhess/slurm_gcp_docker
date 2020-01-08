@@ -2,10 +2,10 @@
 
 . /gcsdk/google-cloud-sdk/path.bash.inc
 
-[ ! -d /run/munge ] && mkdir -p /run/munge
+[ ! -d /run/munge ] && sudo mkdir -p /run/munge
 
-mysqld &
+sudo mysqld &
 cd /usr/local/share/cga_pipeline/src
-./provision_server.py
+sudo -E ./provision_server.py
 export SLURM_CONF=/mnt/nfs/clust_conf/slurm/slurm.conf
 /bin/bash

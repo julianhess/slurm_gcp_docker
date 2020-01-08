@@ -56,6 +56,12 @@ ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 ARG cache_invalidate=2
 RUN git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline
 
+# 11. add current user to container; enable passwordless sudo
+ARG UID
+ARG USER
+RUN adduser -u $UID --gecos "" --disabled-password $USER && adduser $USER sudo
+RUN ssed -i '/^%sudo/s/ALL$/NOPASSWD:ALL/' /etc/sudoers
+
 #
 # clean up /tmp
 RUN rm -rf *
