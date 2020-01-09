@@ -56,7 +56,8 @@ sudo update-grub
 EOF
 gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
   "sudo tee /etc/docker/daemon.json > /dev/null <<< '{ \"insecure-registries\" : [\"'$HOSTNAME':5000\"] }' && " \
-  "sudo systemctl restart docker && sudo docker pull $HOSTNAME:5000/broadinstitute/pydpiper"
+  "sudo systemctl restart docker && sudo docker pull $HOSTNAME:5000/broadinstitute/pydpiper && " \
+  "sudo docker tag $HOSTNAME:5000/broadinstitute/pydpiper broadinstitute/pydpiper" \
 
 # #
 # # generate SSL certificates for internal Docker registry
