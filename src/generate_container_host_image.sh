@@ -63,7 +63,9 @@ gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserK
 # TODO: implement a better check for whether gcloud is properly configured
 #       simply checking for the existence of ~/.config/gcloud is insufficient
 [ -d ~/.config/gcloud ] || { echo "gcloud has not yet been configured. Please run \`gcloud auth login'"; exit 1; }
-gcloud compute scp ~/.config/gcloud/* $HOSTNAME:~/.config/gcloud --zone $ZONE --recurse
+gcloud compute scp ~/.config/gcloud/* $HOST:.config/gcloud --zone $ZONE --recurse
+gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
+  "sudo cp -r ~/.config/gcloud /etc/gcloud"
 
 # #
 # # generate SSL certificates for internal Docker registry
