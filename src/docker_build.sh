@@ -21,6 +21,22 @@ else
 	sudo systemctl restart docker
 fi
 
+echo -n "Waiting for Docker daemon to restart ..."
+while ! systemctl is-active --quiet docker; do
+	sleep 1
+	echo -n "."
+done
+echo
 docker run --rm -d --network host --name registry registry:2
+
+# FIXME: ugly hack to ensure the registry container is up and running -- a
+# casual search didn't turn up a better way to do this easily
+sleep 10
+#echo -n "Waiting for registry container to start ... "
+#while [ `docker inspect -f {{.State.Running}} registry` != "true" ]; do
+#	sleep 1
+#	echo -n "."
+#done
+#echo
 docker tag broadinstitute/pydpiper $HOSTNAME:5000/broadinstitute/pydpiper
 docker push $HOSTNAME:5000/broadinstitute/pydpiper
