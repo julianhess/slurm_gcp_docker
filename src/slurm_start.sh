@@ -1,6 +1,4 @@
-#
-# this file is meant to be sourced from other scripts, and should not be run
-# as a standalone.
+#!/bin/bash
 
 export SLURM_CONF=/mnt/nfs/clust_conf/slurm/slurm.conf
 
