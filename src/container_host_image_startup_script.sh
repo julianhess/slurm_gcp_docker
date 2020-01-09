@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cat <<EOF
+sudo apt-get update && sudo apt-get -y install git nfs-common ssed iptables && \
+wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/containerd.io_1.2.6-3_amd64.deb" && \
+wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
+wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
+sudo dpkg -i "containerd.io_1.2.6-3_amd64.deb" && \
+sudo dpkg -i "docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
+sudo dpkg -i "docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
+sudo git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
+sudo adduser $USER docker && \
+sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 cgroup_enable=memory swapaccount=1"\3/' /etc/default/grub && \
+sudo update-grub && \
+[ ! -d ~$USER/.config/gcloud ] && sudo -u $USER mkdir -p ~$USER/.config/gcloud
+EOF
+
+echo "sudo tee /etc/docker/daemon.json > /dev/null <<< '{ \"insecure-registries\" : [\"'$HOSTNAME':5000\"] }' && " \
+  "sudo systemctl restart docker && sudo docker pull $HOSTNAME:5000/broadinstitute/pydpiper && " \
+  "sudo docker tag $HOSTNAME:5000/broadinstitute/pydpiper broadinstitute/pydpiper"
+
+echo "touch /started"

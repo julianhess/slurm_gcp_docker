@@ -26,39 +26,19 @@ IMAGENAME=$1
 #
 # create dummy instance to build image in
 gcloud compute --project $PROJ instances create $HOST --zone $ZONE \
---machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20200107 \
---image-project ubuntu-os-cloud --boot-disk-size 10GB --boot-disk-type pd-standard
+  --machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20200107 \
+  --image-project ubuntu-os-cloud --boot-disk-size 10GB --boot-disk-type pd-standard \
+  --metadata-from-file startup-script=<(./container_host_image_startup_script.sh)
 
 #
 # wait for instance to be ready
 echo -n "Waiting for dummy instance to be ready ..."
 while ! gcloud compute ssh $HOST --zone $ZONE -- -o "UserKnownHostsFile /dev/null" \
-  -t echo &> /dev/null; do
+  "[ -f /started ]" &> /dev/null; do
 	sleep 1
 	echo -n ".";
 done
 echo
-
-# install software to dummy host
-gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T <<'EOF'
-sudo apt-get update && \
-sudo apt-get -y install nfs-common iptables git ssed && \
-wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/containerd.io_1.2.6-3_amd64.deb" && \
-wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
-wget "https://download.docker.com/linux/ubuntu/dists/disco/pool/stable/amd64/docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
-sudo dpkg -i "containerd.io_1.2.6-3_amd64.deb" && \
-sudo dpkg -i "docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
-sudo dpkg -i "docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
-sudo git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
-sudo adduser $USER docker && \
-sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 cgroup_enable=memory swapaccount=1"\3/' /etc/default/grub && \
-sudo update-grub && \
-[ ! -d ~/.config/gcloud ] && mkdir -p ~/.config/gcloud 
-EOF
-gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
-  "sudo tee /etc/docker/daemon.json > /dev/null <<< '{ \"insecure-registries\" : [\"'$HOSTNAME':5000\"] }' && " \
-  "sudo systemctl restart docker && sudo docker pull $HOSTNAME:5000/broadinstitute/pydpiper && " \
-  "sudo docker tag $HOSTNAME:5000/broadinstitute/pydpiper broadinstitute/pydpiper" \
 
 # TODO: implement a better check for whether gcloud is properly configured
 #       simply checking for the existence of ~/.config/gcloud is insufficient
