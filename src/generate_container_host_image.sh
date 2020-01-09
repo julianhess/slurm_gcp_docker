@@ -52,12 +52,18 @@ sudo dpkg -i "docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
 sudo git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline && \
 sudo adduser $USER docker && \
 sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 cgroup_enable=memory swapaccount=1"\3/' /etc/default/grub && \
-sudo update-grub
+sudo update-grub && \
+[ ! -d ~/.config/gcloud ] && mkdir -p ~/.config/gcloud 
 EOF
 gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
   "sudo tee /etc/docker/daemon.json > /dev/null <<< '{ \"insecure-registries\" : [\"'$HOSTNAME':5000\"] }' && " \
   "sudo systemctl restart docker && sudo docker pull $HOSTNAME:5000/broadinstitute/pydpiper && " \
   "sudo docker tag $HOSTNAME:5000/broadinstitute/pydpiper broadinstitute/pydpiper" \
+
+# TODO: implement a better check for whether gcloud is properly configured
+#       simply checking for the existence of ~/.config/gcloud is insufficient
+[ -d ~/.config/gcloud ] || { echo "gcloud has not yet been configured. Please run \`gcloud auth login'"; exit 1; }
+gcloud compute scp ~/.config/gcloud/* $HOSTNAME:~/.config/gcloud --zone $ZONE --recurse
 
 # #
 # # generate SSL certificates for internal Docker registry
