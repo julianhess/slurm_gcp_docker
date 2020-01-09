@@ -31,7 +31,8 @@ COPY gc_conf /etc/gcloud
 RUN adduser -u 1337 --gecos "" --disabled-password slurm && \
 mkdir -p ~slurm/.config && cp -r /etc/gcloud ~slurm/.config/gcloud && \
 chown -R slurm:slurm ~slurm/.config/gcloud && \
-mkdir -p /var/spool/slurm && chown slurm:slurm /var/spool/slurm
+mkdir -p /var/spool/slurm && chown slurm:slurm /var/spool/slurm && \
+mkdir -p /run/munge
 
 # 6. configure MySQL
 RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld && \
