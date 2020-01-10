@@ -71,7 +71,7 @@ RUN rm -rf *
 
 #
 # set entrypoint
-ENTRYPOINT /usr/local/share/cga_pipeline/src/docker_entrypoint.sh
+ENTRYPOINT /usr/local/share/cga_pipeline/src/docker_entrypoint_controller.sh
 
 #
 # set Slurm environment
