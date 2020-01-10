@@ -1,4 +1,4 @@
-FROM ubuntu:19.10
+FROM ubuntu:19.10 as build
 
 WORKDIR /tmp
 
@@ -68,6 +68,15 @@ ssed -i '/^%sudo/s/ALL$/NOPASSWD:ALL/' /etc/sudoers
 #
 # clean up /tmp
 RUN rm -rf *
+
+#
+# clean up packages
+RUN apt-get -y remove build-essential vim git && apt-get -y autoremove
+
+#
+# make squashed build
+FROM scratch
+COPY --from=build / /
 
 #
 # set entrypoint
