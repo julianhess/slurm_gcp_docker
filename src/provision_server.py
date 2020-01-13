@@ -70,6 +70,10 @@ if __name__ == "__main__":
 	  [ ! -d /mnt/nfs/clust_scripts ] && mkdir -p /mnt/nfs/clust_scripts ||
 	    echo -n
 	  """, shell = True, executable = '/bin/bash')
+	subprocess.check_call("""
+	  [ ! -d /mnt/nfs/workspace ] && mkdir -p /mnt/nfs/workspace ||
+	    echo -n
+	  """, shell = True, executable = '/bin/bash')
 
 	# Slurm conf. file cgroup.conf can be copied-as is (other conf. files will
 	# need editing below)
