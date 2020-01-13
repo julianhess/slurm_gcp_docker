@@ -162,7 +162,7 @@ if __name__ == "__main__":
 	    echo -n "."
 	  done
 	  echo
-	  sacctmgr -i add cluster cluster
+	  sudo -E sacctmgr -i add cluster cluster
 	  pgrep slurmctld || sudo -E slurmctld -c -f {conf_path} &&
 	    sudo -E slurmctld reconfigure;
 	  pgrep munged || sudo -E munged -f
