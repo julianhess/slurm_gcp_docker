@@ -3,6 +3,7 @@
 import argparse
 import io
 import os
+import pwd
 import pandas as pd
 import re
 import shlex
@@ -74,6 +75,8 @@ if __name__ == "__main__":
 	  [ ! -d /mnt/nfs/workspace ] && mkdir -p /mnt/nfs/workspace ||
 	    echo -n
 	  """, shell = True, executable = '/bin/bash')
+	subprocess.check_call("sudo chown -R {U}:{U} /mnt/nfs".format(U = pwd.getpwuid(os.getuid()).pw_name),
+	  shell = True, executable = '/bin/bash')
 
 	# Slurm conf. file cgroup.conf can be copied-as is (other conf. files will
 	# need editing below)
@@ -152,7 +155,7 @@ if __name__ == "__main__":
 	  done
 	  echo
 	  export SLURM_CONF={conf_path};
-	  pgrep slurmdbd || slurmdbd;
+	  pgrep slurmdbd || sudo -E slurmdbd;
 	  echo -n "Waiting for database to be ready ..."
 	  while ! sacctmgr -i list cluster &> /dev/null; do
 	    sleep 1
@@ -160,9 +163,9 @@ if __name__ == "__main__":
 	  done
 	  echo
 	  sacctmgr -i add cluster cluster
-	  pgrep slurmctld || slurmctld -c -f {conf_path} &&
-	    slurmctld reconfigure;
-	  pgrep munged || munged -f
+	  pgrep slurmctld || sudo -E slurmctld -c -f {conf_path} &&
+	    sudo -E slurmctld reconfigure;
+	  pgrep munged || sudo -E munged -f
 	  """.format(conf_path = "/mnt/nfs/clust_conf/slurm/slurm.conf"),
 	  shell = True,
 	  stderr = subprocess.DEVNULL,
