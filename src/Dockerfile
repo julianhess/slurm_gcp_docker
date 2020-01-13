@@ -57,10 +57,11 @@ ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 ARG cache_invalidate=2
 RUN git clone https://github.com/julianhess/cga_pipeline.git /usr/local/share/cga_pipeline
 
-# 11. add current user to container; enable passwordless sudo
+# 11. add current user to container; enable passwordless sudo and rootless docker
 ARG UID
 ARG USER
-RUN adduser -u $UID --gecos "" --disabled-password $USER && adduser $USER sudo && \
+RUN adduser -u $UID --gecos "" --disabled-password $USER && \
+adduser $USER sudo && groupadd -g 1338 docker && adduser $USER docker && \
 HOMEDIR=`eval echo ~$USER` && mkdir -p $HOMEDIR/.config && \
 cp -r /etc/gcloud $HOMEDIR/.config/gcloud && chown -R $USER:$USER $HOMEDIR/.config/ && \
 ssed -i '/^%sudo/s/ALL$/NOPASSWD:ALL/' /etc/sudoers
