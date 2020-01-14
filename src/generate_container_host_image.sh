@@ -79,17 +79,11 @@ echo "Snapshotting dummy host drive ..."
 gcloud compute disks snapshot $HOST --snapshot-names ${HOST}-snap --zone $ZONE || \
   { echo "Error creating snapshot!"; exit 1; }
 
-echo "Creating template disk from snapshot ..."
-gcloud compute disks create ${HOST}-tmpdr --source-snapshot=${HOST}-snap --size 10GB \
-  --zone $ZONE || { echo "Error creating template disk!"; exit 1; }
-
-echo "Creating image from template disk ..."
-gcloud compute images create $IMAGENAME --source-disk=${HOST}-tmpdr --source-disk-zone $ZONE --family pydpiper || \
+echo "Creating image from snapshot ..."
+gcloud compute images create $IMAGENAME --source-snapshot=${HOST}-snap --family pydpiper || \
   { echo "Error creating image!"; exit 1; }
 
 echo "Deleting snapshot/template disk ..."
-gcloud compute disks delete ${HOST}-tmpdr --zone $ZONE --quiet || \
-  { echo "Error deleting template disk!"; exit 1; }
 gcloud compute snapshots delete ${HOST}-snap --quiet || { echo "Error deleting snapshot!"; exit 1; }
 
 #
