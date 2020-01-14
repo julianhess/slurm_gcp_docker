@@ -44,7 +44,7 @@ mysql -u root -e "grant all on slurm_acct_db.* TO 'slurm'@'localhost';"
 RUN dd if=/dev/zero bs=1 count=1024 of=/etc/munge/munge.key
 
 # 8. Python prereqs
-RUN pip install pandas
+RUN pip install pandas crcmod
 
 # 9. install gcloud
 RUN mkdir /gcsdk && \
