@@ -24,7 +24,7 @@ case "$DISKTYPE" in
 		;;
 esac
 
-if [ ! -z ${SNAPSHOT+x} ]; then
+if [ ! -z "$SNAPSHOT" ]; then
 	SNAPSTRING="--source-snapshot $SNAPSHOT"
 else
 	SNAPSTRING=""
