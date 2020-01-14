@@ -52,12 +52,12 @@ gcloud compute disks list --filter="name=${HOSTNAME}-nfs" --format='csv[no-headi
 #
 # format NFS disk if it's not already formatted (ext4)
 
-# XXX: we assume that this will always be /dev/sdb. In the future, if we are
-#      attaching multiple disks, this might not be the case.
+# XXX: we assume that this will always be /dev/disk/by-id/google-$HOSTNAME-nfs.
+#      In the future, if we are attaching multiple disks, this might not be the case.
 
-[[ $(lsblk -no FSTYPE /dev/sdb) == "ext4" ]] || {
+[[ $(lsblk -no FSTYPE /dev/disk/by-id/google-${HOSTNAME}-nfs) == "ext4" ]] || {
 echo -e "\nFormatting disk ...\n"
-sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb;
+sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/disk/by-id/google-${HOSTNAME}-nfs;
 }
 
 #
@@ -66,7 +66,7 @@ echo -e "\nMounting disk ...\n"
 
 # this should already be present, but let's do this just in case
 [ ! -d /mnt/nfs ] && sudo mkdir -p /mnt/nfs
-sudo mount -o discard,defaults /dev/sdb /mnt/nfs
+sudo mount -o discard,defaults /dev/disk/by-id/google-${HOSTNAME}-nfs /mnt/nfs
 sudo chmod 777 /mnt/nfs
 
 #
