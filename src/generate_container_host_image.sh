@@ -27,7 +27,7 @@ IMAGENAME=$1
 # create dummy instance to build image in
 gcloud compute --project $PROJ instances create $HOST --zone $ZONE \
   --machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20200107 \
-  --image-project ubuntu-os-cloud --boot-disk-size 10GB --boot-disk-type pd-standard \
+  --image-project ubuntu-os-cloud --boot-disk-size 50GB --boot-disk-type pd-standard \
   --metadata-from-file startup-script=<(./container_host_image_startup_script.sh)
 
 #
