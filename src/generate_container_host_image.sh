@@ -3,9 +3,11 @@
 set -e
 
 #
-# parse in zone, or use zone of current instance (if any)
+# use zone of current instance
 ZONE=$(gcloud compute instances list --filter="name=${HOSTNAME}" \
   --format='csv[no-heading](zone)')
+
+# TODO: allow user to specify zone; validate this, e.g.
 # if ! grep -qE '(asia|australia|europe|northamerica|southamerica|us)-[a-z]+\d+-[a-z]' <<< "$ZONE"; then
 # 	echo "Error: invalid zone"
 # 	exit 1
@@ -46,26 +48,6 @@ echo
 gcloud compute scp ~/.config/gcloud/* $HOST:.config/gcloud --zone $ZONE --recurse
 gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
   "sudo cp -r ~/.config/gcloud /etc/gcloud"
-
-# #
-# # generate SSL certificates for internal Docker registry
-# mkdir -p ../certs
-# openssl req -batch -newkey rsa:4096 -nodes -sha256 -keyout ../certs/domain.key \
-#   -x509 -days 11499 -out ../certs/domain.crt
-# 
-# # copy certs to dummy host
-# gcloud compute scp ../certs root@$HOST:/usr/local/share/cga_pipeline/certs --zone $ZONE --recurse
-# 
-# CERT_DIR=/etc/docker/certs.d/$HOSTNAME:5000/
-# 
-# gcloud compute scp ../certs root@$HOST:/usr/local/share/cga_pipeline/certs --zone $ZONE --recurse
-# gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
-#   "[ ! -d $CERT_DIR ] && sudo mkdir -p $CERT_DIR"
-# gcloud compute scp ../certs/domain.crt root@$HOST:$CERT_DIR --zone $ZONE --recurse
-# 
-# # copy cert locally
-# [ ! -d $CERT_DIR ] && sudo mkdir -p $CERT_DIR
-# sudo cp ../certs/domain.crt $CERT_DIR
 
 #
 # shut down dummy instance
