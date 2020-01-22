@@ -43,7 +43,7 @@ def print_conf(D, path):
 
 if __name__ == "__main__":
 	CLUST_PROV_ROOT = os.environ["CLUST_PROV_ROOT"] if "CLUST_PROV_ROOT" in os.environ \
-	                  else "/usr/local/share/cga_pipeline"
+	                  else "/usr/local/share/slurm_gcp_docker"
 	#TODO: check if this is indeed a valid path
 
 	ctrl_hostname = socket.gethostname()

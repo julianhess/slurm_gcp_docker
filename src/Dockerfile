@@ -55,7 +55,7 @@ ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 
 # 10. get cluster utility scripts
 ARG cache_invalidate=2
-RUN git clone https://github.com/getzlab/slurm_gcp_docker /usr/local/share/cga_pipeline
+RUN git clone https://github.com/getzlab/slurm_gcp_docker /usr/local/share/slurm_gcp_docker
 
 # 11. add current user to container; enable passwordless sudo and rootless docker
 ARG UID
@@ -82,7 +82,7 @@ COPY --from=build / /
 
 #
 # set entrypoint
-ENTRYPOINT /usr/local/share/cga_pipeline/src/docker_entrypoint_controller.sh
+ENTRYPOINT /usr/local/share/slurm_gcp_docker/src/docker_entrypoint_controller.sh
 
 #
 # set Slurm environment

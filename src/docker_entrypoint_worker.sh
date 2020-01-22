@@ -1,4 +1,4 @@
 #!/bin/bash
 
-. /usr/local/share/cga_pipeline/src/slurm_start.sh
+. /usr/local/share/slurm_gcp_docker/src/slurm_start.sh
 /bin/bash

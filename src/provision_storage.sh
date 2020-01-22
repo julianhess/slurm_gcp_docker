@@ -2,6 +2,6 @@
 
 export CLOUDSDK_CONFIG=/etc/gcloud
 
-/usr/local/share/cga_pipeline/src/nfs_provision_server.sh $1 $2
+/usr/local/share/slurm_gcp_docker/src/nfs_provision_server.sh $1 $2
 
-. /usr/local/share/cga_pipeline/src/slurm_start.sh
+. /usr/local/share/slurm_gcp_docker/src/slurm_start.sh

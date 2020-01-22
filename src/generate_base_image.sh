@@ -87,7 +87,7 @@ sudo wget -O gcs.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/
 sudo tar xzf gcs.tgz -C /gcsdk && \
 sudo /gcsdk/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet && \
 sudo ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin && \
-sudo git clone https://github.com/getzlab/slurm_gcp_docker /usr/local/share/cga_pipeline && \
+sudo git clone https://github.com/getzlab/slurm_gcp_docker /usr/local/share/slurm_gcp_docker && \
 sudo pip install pandas canine && \
 rm -rf ~/*
 EOF
