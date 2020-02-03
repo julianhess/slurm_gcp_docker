@@ -30,7 +30,7 @@ def parsein(X, col, regex, fields):
 	return pd.concat([X, T], 1)
 
 def parse(X, regex, fields):
-	T = X.str.extract(regex).rename(columns = dict(zip(range(0, len(fields)), fields)));
+	T = X.str.extract(regex).rename(columns = dict(enumerate(fields)));
 	return T
 
 def print_conf(D, path):
@@ -59,22 +59,17 @@ if __name__ == "__main__":
 	# copy common files to NFS
 
 	# ensure directories exist
-	subprocess.check_call("""
-	  [ ! -d /mnt/nfs/clust_conf/slurm ] && mkdir -p /mnt/nfs/clust_conf/slurm ||
-	    echo -n
-	  """, shell = True, executable = '/bin/bash')
-	subprocess.check_call("""
-	  [ ! -d /mnt/nfs/clust_conf/canine ] && mkdir -p /mnt/nfs/clust_conf/canine ||
-	    echo -n
-	  """, shell = True, executable = '/bin/bash')
-	subprocess.check_call("""
-	  [ ! -d /mnt/nfs/clust_scripts ] && mkdir -p /mnt/nfs/clust_scripts ||
-	    echo -n
-	  """, shell = True, executable = '/bin/bash')
-	subprocess.check_call("""
-	  [ ! -d /mnt/nfs/workspace ] && mkdir -p /mnt/nfs/workspace ||
-	    echo -n
-	  """, shell = True, executable = '/bin/bash')
+	for d in [
+	  "/mnt/nfs/clust_conf/slurm",
+	  "/mnt/nfs/clust_conf/canine",
+	  "/mnt/nfs/clust_scripts",
+	  "/mnt/nfs/workspace"
+	]:
+		subprocess.check_call("""
+		  [ ! -d """ + d + " ] && mkdir -p " + d + """ ||
+			echo -n
+		  """, shell = True, executable = '/bin/bash')
+
 	subprocess.check_call("sudo chown -R {U}:{U} /mnt/nfs".format(U = pwd.getpwuid(os.getuid()).pw_name),
 	  shell = True, executable = '/bin/bash')
 
