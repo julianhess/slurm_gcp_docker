@@ -16,6 +16,13 @@ sudo update-grub && \
 [ ! -d ~$USER/.config/gcloud ] && sudo -u $USER mkdir -p ~$USER/.config/gcloud
 EOF
 
+echo "[ ! -d /etc/systemd/system/google-shutdown-scripts.service.d ] && \
+sudo mkdir -p /etc/systemd/system/google-shutdown-scripts.service.d; \
+sudo tee /etc/systemd/system/google-shutdown-scripts.service.d/override.conf > /dev/null <<EOF
+[Unit]
+After=docker.service
+EOF"
+
 echo "sudo tee /etc/docker/daemon.json > /dev/null <<< '{ \"insecure-registries\" : [\"'$HOSTNAME':5000\"] }' && " \
   "sudo systemctl restart docker && sudo docker pull $HOSTNAME:5000/broadinstitute/pydpiper && " \
   "sudo docker tag $HOSTNAME:5000/broadinstitute/pydpiper broadinstitute/pydpiper"
