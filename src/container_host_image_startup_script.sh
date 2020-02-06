@@ -27,7 +27,8 @@ After=docker.service
 EOF"
 
 # build current user into container
-echo "sudo docker build -t broadinstitute/pydpiper:v0.1 -t broadinstitute/pydpiper:latest \
+echo "sudo docker build -t broadinstitute/slurm_gcp_docker:v0.2 \
+  -t broadinstitute/slurm_gcp_docker:latest \
   --build-arg USER=$USER --build-arg UID=$UID --build-arg GID=$(id -g) \
   /usr/local/share/slurm_gcp_docker/src"
 

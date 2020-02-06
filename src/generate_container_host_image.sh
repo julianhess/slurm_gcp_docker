@@ -62,7 +62,7 @@ gcloud compute disks snapshot $HOST --snapshot-names ${HOST}-snap --zone $ZONE |
   { echo "Error creating snapshot!"; exit 1; }
 
 echo "Creating image from snapshot ..."
-gcloud compute images create $IMAGENAME --source-snapshot=${HOST}-snap --family pydpiper || \
+gcloud compute images create $IMAGENAME --source-snapshot=${HOST}-snap --family slurm-gcp-docker || \
   { echo "Error creating image!"; exit 1; }
 
 echo "Deleting snapshot/template disk ..."

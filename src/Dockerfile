@@ -1,6 +1,4 @@
-FROM <GCP Slurm> as build
-
-WORKDIR /tmp
+FROM gcr.io/broad-getzlab-workflows/slurm_gcp_docker_base
 
 # add current user to container; enable passwordless sudo and rootless docker
 ARG UID
