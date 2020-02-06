@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# install NFS, Docker, files to build Slurm Docker image
 cat <<EOF
 sudo apt-get update && sudo apt-get -y install git nfs-kernel-server nfs-common portmap ssed iptables && \
 sudo groupadd -g 1338 docker && \
@@ -16,6 +17,8 @@ sudo update-grub && \
 [ ! -d ~$USER/.config/gcloud ] && sudo -u $USER mkdir -p ~$USER/.config/gcloud
 EOF
 
+# make sure shutdown script that tells Slurm controller node is going offline
+# run before the Docker daemon shuts down
 echo "[ ! -d /etc/systemd/system/google-shutdown-scripts.service.d ] && \
 sudo mkdir -p /etc/systemd/system/google-shutdown-scripts.service.d; \
 sudo tee /etc/systemd/system/google-shutdown-scripts.service.d/override.conf > /dev/null <<EOF
@@ -23,8 +26,9 @@ sudo tee /etc/systemd/system/google-shutdown-scripts.service.d/override.conf > /
 After=docker.service
 EOF"
 
-echo "sudo tee /etc/docker/daemon.json > /dev/null <<< '{ \"insecure-registries\" : [\"'$HOSTNAME':5000\"] }' && " \
-  "sudo systemctl restart docker && sudo docker pull $HOSTNAME:5000/broadinstitute/pydpiper && " \
-  "sudo docker tag $HOSTNAME:5000/broadinstitute/pydpiper broadinstitute/pydpiper"
+# build current user into container
+echo "sudo docker build -t broadinstitute/pydpiper:v0.1 -t broadinstitute/pydpiper:latest \
+  --build-arg USER=$USER --build-arg UID=$UID --build-arg GID=$(id -g) \
+  /usr/local/share/slurm_gcp_docker/src"
 
 echo "touch /started"
