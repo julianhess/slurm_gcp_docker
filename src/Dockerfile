@@ -6,8 +6,9 @@ WORKDIR /tmp
 ARG UID
 ARG GID
 ARG USER
+ENV UID=$UID
+ENV GID=$GID
+ENV USER=$USER
 RUN groupadd -g $GID $USER && adduser --gid $GID -u $UID --gecos "" --disabled-password $USER && \
 adduser $USER sudo && groupadd -g 1338 docker && adduser $USER docker && \
-HOMEDIR=`eval echo ~$USER` && mkdir -p $HOMEDIR/.config && \
-cp -r /etc/gcloud $HOMEDIR/.config/gcloud && chown -R $USER:$USER $HOMEDIR/.config/ && \
 ssed -i '/^%sudo/s/ALL$/NOPASSWD:ALL/' /etc/sudoers
