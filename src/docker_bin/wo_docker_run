@@ -4,12 +4,8 @@ set -e
 
 ## Argument checks.
 for arg in "$@"; do
-    if [ "$arg" = "--detach" ] || [ "$arg" = "-d" ]; then
-        echo "Should not give '--detach' argument to $0" >&2
-        exit 1
-    fi
-    if [ "$arg" = "--rm" ]; then
-        echo "Should not give '--rm' argument to $0" >&2
+    if [ "$arg" = "--cidfile" ]; then
+        echo "Should not give '--cidfile' argument to $0" >&2
         exit 1
     fi
 done
@@ -18,13 +14,34 @@ if [ "$SLURM_JOB_ID" = "" ]; then
     exit 1
 fi
 
-## Start running the container in detach mode.
+## File to store container name, remove it first, then
+## check its existence after docker run.
+WO_CONTAINER_NAME_FILE=`mktemp --suffix .wo_docker_run.cid`
+rm $WO_CONTAINER_NAME_FILE
+
+## Start running the container in background, with STDIN from this script.
 ## Also use --pid=host for protecting mental health.
-WO_CONTAINER_NAME=`docker run -d --pid host $@`
+docker run --pid host --cidfile $WO_CONTAINER_NAME_FILE $@ < <(cat) &
+
+## Wait until the CID file is created or the process stopped (by accident!)
+while true; do
+    ## Check file
+    if [ -f $WO_CONTAINER_NAME_FILE ]; then
+        break
+    fi
+    ## Check accidents
+    if ! kill -0 $!; then
+        wait $!
+        exit $?
+    fi
+    sleep 0.0001
+done
+
+## Read out the container id
+WO_CONTAINER_NAME=`cat $WO_CONTAINER_NAME_FILE`
 
 ## Get the container PID
 WO_CONTAINER_PID=`docker inspect -f '{{ .State.Pid }}' $WO_DOCKER_CONTAINER_NAME`
-
 
 ## There is a chance that $WO_CONTAINER_PID is zero if the
 ## container has stopped before `docker inspect`, in this case,
@@ -44,11 +61,5 @@ if [ "$WO_CONTAINER_PID" != 0 ]; then
     cgclassify -g memory,cpuset,freezer:/slurm/uid_$UID/job_$SLURM_JOB_ID/step_batch $(pgrep -P $WO_CONTAINER_PID)
 fi
 
-## Wait for the container
-docker wait $WO_CONTAINER_NAME
-
-## Output the logs
-docker logs $WO_CONTAINER_NAME
-
-## Finally remove the container
-docker rm $WO_CONTAINER_NAME
+## Wait for docker run
+wait $!
