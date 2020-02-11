@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+set -e
+
+## Argument checks.
+for arg in "$@"; do
+    if [ "$arg" = "--detach" ] || [ "$arg" = "-d" ]; then
+        echo "Should not give '--detach' argument to $0" >&2
+        exit 1
+    fi
+    if [ "$arg" = "--rm" ]; then
+        echo "Should not give '--rm' argument to $0" >&2
+        exit 1
+    fi
+done
+if [ "$SLURM_JOB_ID" = "" ]; then
+    echo "Can not find SLURM_JOB_ID environment variable" >&2
+    exit 1
+fi
+
+## Start running the container in detach mode.
+## Also use --pid=host for protecting mental health.
+WO_CONTAINER_NAME=`docker run -d --pid host $@`
+
+## Get the container PID
+WO_CONTAINER_PID=`docker inspect -f '{{ .State.Pid }}' $WO_DOCKER_CONTAINER_NAME`
+
+
+## There is a chance that $WO_CONTAINER_PID is zero if the
+## container has stopped before `docker inspect`, in this case,
+## we do not need cgclassify.
+if [ "$WO_CONTAINER_PID" != 0 ]; then
+    ## Classify the container process (and all of it's children)
+    ## to the Slurm's cgroups assigned to the job
+ 
+    # Set the container process free from the docker cgroups
+    cgclassify -g blkio,net_cls,devices,cpuacct,cpu:/ $WO_CONTAINER_PID
+
+    # Include the container process in the Slurm cgroups
+    cgclassify -g memory,cpuset,freezer:/slurm/uid_$UID/job_$SLURM_JOB_ID/step_batch $WO_CONTAINER_PID
+
+    ## Do the same with the child processes
+    cgclassify -g blkio,net_cls,devices,cpuacct,cpu:/                                $(pgrep -P $WO_CONTAINER_PID)
+    cgclassify -g memory,cpuset,freezer:/slurm/uid_$UID/job_$SLURM_JOB_ID/step_batch $(pgrep -P $WO_CONTAINER_PID)
+fi
+
+## Wait for the container
+docker wait $WO_CONTAINER_NAME
+
+## Output the logs
+docker logs $WO_CONTAINER_NAME
+
+## Finally remove the container
+docker rm $WO_CONTAINER_NAME
