@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
 	# scripts
 	subprocess.check_call(
-	  "cp {CPR}/src/* /mnt/nfs/clust_scripts".format(CPR = shlex.quote(CLUST_PROV_ROOT)),
+	  "cp -r {CPR}/src/* /mnt/nfs/clust_scripts".format(CPR = shlex.quote(CLUST_PROV_ROOT)),
 	  shell = True
 	)
 
