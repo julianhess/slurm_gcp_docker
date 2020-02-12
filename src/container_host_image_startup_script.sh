@@ -34,6 +34,7 @@ sudo mkdir -p /etc/systemd/system/google-shutdown-scripts.service.d; \
 sudo tee /etc/systemd/system/google-shutdown-scripts.service.d/override.conf > /dev/null <<EOF
 [Unit]
 After=docker.service
+After=docker.socket
 EOF"
 
 # build current user into container
