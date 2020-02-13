@@ -41,7 +41,7 @@ done
 WO_CONTAINER_NAME=`cat $WO_CONTAINER_NAME_FILE`
 
 ## Get the container PID
-WO_CONTAINER_PID=`docker inspect -f '{{ .State.Pid }}' $WO_DOCKER_CONTAINER_NAME`
+WO_CONTAINER_PID=`docker inspect -f '{{ .State.Pid }}' $WO_CONTAINER_NAME`
 
 ## There is a chance that $WO_CONTAINER_PID is zero if the
 ## container has stopped before `docker inspect`, in this case,
