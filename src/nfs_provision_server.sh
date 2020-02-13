@@ -12,8 +12,11 @@ SIZE=$1
 shift
 DISKTYPE=$1
 shift
-SNAPSHOT=$1
+IMAGE=$1
+shift
+IMAGEPROJ=$1
 
+# set default disk to spinning
 case "$DISKTYPE" in
 	pd-standard)
 		;;
@@ -24,10 +27,16 @@ case "$DISKTYPE" in
 		;;
 esac
 
-if [ ! -z "$SNAPSHOT" ]; then
-	SNAPSTRING="--source-snapshot $SNAPSHOT"
+# set default image project to current project
+if [ -z "$IMAGEPROJ" ]; then
+	IMAGEPROJ=`gcloud config list --format='value(core.project)'`
+fi
+
+# format disk image string, if it exists
+if [ ! -z "$IMAGE" ]; then
+	IMAGESTRING="--image $IMAGE --image-project $IMAGEPROJ"
 else
-	SNAPSTRING=""
+	IMAGESTRING=""
 fi
 
 #
@@ -41,7 +50,7 @@ echo -e "Creating NFS disk ...\n"
 
 gcloud compute disks list --filter="name=${HOSTNAME}-nfs" --format='csv[no-heading](type)' | \
   grep -q $DISKTYPE || \
-  gcloud compute disks create ${HOSTNAME}-nfs --size ${SIZE}GB --type $DISKTYPE --zone $ZONE $SNAPSTRING
+  gcloud compute disks create ${HOSTNAME}-nfs --size ${SIZE}GB --type $DISKTYPE --zone $ZONE $IMAGESTRING
 [ -b /dev/disk/by-id/google-${HOSTNAME}-nfs ] && \
   echo "Disk is already attached!" || \
   { gcloud compute instances attach-disk $HOSTNAME --disk ${HOSTNAME}-nfs --zone $ZONE \
