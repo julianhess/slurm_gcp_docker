@@ -78,6 +78,10 @@ echo -e "\nMounting disk ...\n"
 sudo mount -o discard,defaults /dev/disk/by-id/google-${HOSTNAME}-nfs /mnt/nfs
 sudo chmod 777 /mnt/nfs
 
+# if disk was initialized with a smaller image than the target size, we need to
+# expand.
+sudo resize2fs  /dev/disk/by-id/google-${HOSTNAME}-nfs
+
 #
 # add to exports; restart NFS server
 
