@@ -3,7 +3,7 @@
 export CLOUDSDK_CONFIG=/etc/gcloud
 
 # initialize NFS server
-/usr/local/share/slurm_gcp_docker/src/nfs_provision_server.sh $1 $2 $3
+/usr/local/share/slurm_gcp_docker/src/nfs_provision_server.sh $1 $2 $3 $4
 
 # start Slurm docker
 docker run -dti --rm --network host -v /mnt/nfs:/mnt/nfs -v /sys/fs/cgroup:/sys/fs/cgroup \
