@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Usage: nfs_provision_server.sh <disk size in GB> [disk type [disk snapshot]]
+# Usage: nfs_provision_server.sh <disk size in GB> [disk type [disk image [disk image project]]]
 
 set -e -o pipefail
 
@@ -11,9 +11,9 @@ set -e -o pipefail
 SIZE=$1
 shift
 DISKTYPE=$1
-shift
+[ ! -z "$DISKTYPE" ] && shift
 IMAGE=$1
-shift
+[ ! -z "$IMAGE" ] && shift
 IMAGEPROJ=$1
 
 # set default disk to spinning
@@ -84,7 +84,7 @@ sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/di
 
 #
 # resize to full user-requested size
-gcloud compute disks resize ${HOSTNAME}-nfs --size ${SIZE}GB --zone $ZONE || \
+gcloud compute disks resize ${HOSTNAME}-nfs --size ${SIZE}GB --zone $ZONE --quiet || \
 echo "Disk is already larger than user requested size!"
 
 #
