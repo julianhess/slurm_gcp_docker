@@ -39,6 +39,19 @@ else
 	IMAGESTRING=""
 fi
 
+# if we did not specify an image, then we will initialize the NFS disk to
+# 10 GB (and subsequenty resize to the requested size)
+# if we did specify an image, we will initialize the NFS disk to the image isze
+# (and subsequently resize)
+# this dramatically improves NFS creation performance -- resize2fs is much faster
+# than mkfs
+
+if [ -z "$IMAGESTRING" ]; then
+	INIT_SIZE=10
+else
+	INIT_SIZE=`gcloud compute images describe $IMAGE --project $IMAGEPROJ --format 'value(diskSizeGb)'`
+fi
+
 #
 # get zone of instance
 ZONE=$(gcloud compute instances list --filter="name=${HOSTNAME}" \
@@ -50,7 +63,7 @@ echo -e "Creating NFS disk ...\n"
 
 gcloud compute disks list --filter="name=${HOSTNAME}-nfs" --format='csv[no-heading](type)' | \
   grep -q $DISKTYPE || \
-  gcloud compute disks create ${HOSTNAME}-nfs --size ${SIZE}GB --type $DISKTYPE --zone $ZONE $IMAGESTRING
+  gcloud compute disks create ${HOSTNAME}-nfs --size ${INIT_SIZE}GB --type $DISKTYPE --zone $ZONE $IMAGESTRING
 [ -b /dev/disk/by-id/google-${HOSTNAME}-nfs ] && \
   echo "Disk is already attached!" || \
   { gcloud compute instances attach-disk $HOSTNAME --disk ${HOSTNAME}-nfs --zone $ZONE \
@@ -70,6 +83,11 @@ sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/di
 }
 
 #
+# resize to full user-requested size
+gcloud compute disks resize ${HOSTNAME}-nfs --size ${SIZE}GB --zone $ZONE || \
+echo "Disk is already larger than user requested size!"
+
+#
 # mount NFS disk
 echo -e "\nMounting disk ...\n"
 
@@ -80,7 +98,7 @@ sudo chmod 777 /mnt/nfs
 
 # if disk was initialized with a smaller image than the target size, we need to
 # expand.
-sudo resize2fs  /dev/disk/by-id/google-${HOSTNAME}-nfs
+sudo resize2fs /dev/disk/by-id/google-${HOSTNAME}-nfs
 
 #
 # add to exports; restart NFS server
