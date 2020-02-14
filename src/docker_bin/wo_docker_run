@@ -24,17 +24,22 @@ rm $WO_CONTAINER_NAME_FILE
 docker run --pid host --cidfile $WO_CONTAINER_NAME_FILE $@ < <(cat) &
 
 ## Wait until the CID file is created or the process stopped (by accident!)
+sleep 0.1
 while true; do
-    ## Check file
+    sleep 0.01
+    ## Check file and it is not EMPTY !!!
     if [ -f $WO_CONTAINER_NAME_FILE ]; then
-        break
+        if [ "`cat $WO_CONTAINER_NAME_FILE`" != "" ]; then
+            break
+        #else
+        #    echo I checked $WO_CONTAINER_NAME_FILE once
+        fi
     fi
     ## Check accidents
     if ! kill -0 $!; then
         wait $!
         exit $?
     fi
-    sleep 0.0001
 done
 
 ## Read out the container id
@@ -49,7 +54,7 @@ WO_CONTAINER_PID=`docker inspect -f '{{ .State.Pid }}' $WO_CONTAINER_NAME`
 if [ "$WO_CONTAINER_PID" != 0 ]; then
     ## Classify the container process (and all of it's children)
     ## to the Slurm's cgroups assigned to the job
- 
+
     # Set the container process free from the docker cgroups
     cgclassify -g blkio,net_cls,devices,cpuacct,cpu:/ $WO_CONTAINER_PID
 
