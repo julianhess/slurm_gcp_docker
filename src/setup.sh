@@ -11,4 +11,4 @@ sudo apt-get -y install nfs-common
 
 sudo docker build -t broadinstitute/slurm_gcp_docker:v0.2.2 \
   -t broadinstitute/slurm_gcp_docker:latest \
-  --build-arg HOST_USER=$USER --build-arg UID=$UID --build-arg GID=$(id -g) .
+  --build-arg HOST_USER=$(echo $USER | tr A-Z a-z) --build-arg UID=$UID --build-arg GID=$(id -g) .
