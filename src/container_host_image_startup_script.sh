@@ -38,7 +38,8 @@ After=docker.socket
 EOF"
 
 # build current user into container
-echo "sudo docker build -t broadinstitute/slurm_gcp_docker:v0.3 \
+echo "VERSION=$(cat /usr/local/share/slurm_gcp_docker/src/VERSION) && \
+  sudo docker build -t broadinstitute/slurm_gcp_docker:$VERSION \
   -t broadinstitute/slurm_gcp_docker:latest \
   --build-arg HOST_USER=$USER --build-arg UID=$UID --build-arg GID=$(id -g) \
   /usr/local/share/slurm_gcp_docker/src"
