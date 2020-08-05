@@ -3,7 +3,10 @@
 # This builds the base container image. Generally, this will be pulled from the
 # container registry.
 
-sudo docker build -t broadinstitute/slurm_gcp_docker_base:v0.2 \
+# note that the Docker daemon must have experimental features enabled;
+# add { "experimental": true } to /etc/docker/daemon.json
+
+sudo docker build --squash -t broadinstitute/slurm_gcp_docker_base:v0.2 \
   -t broadinstitute/slurm_gcp_docker_base:latest \
   -f Dockerfile_base .
 

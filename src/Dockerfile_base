@@ -61,15 +61,6 @@ RUN rm -rf *
 RUN apt-get -y remove build-essential vim git && apt-get -y autoremove
 
 #
-# make squashed build
-FROM scratch
-COPY --from=build / /
-
-# restore setuid/setguid permissions
-RUN chmod u+s /usr/bin/passwd /usr/bin/newgrp /usr/bin/gpasswd /usr/bin/chsh /usr/bin/chfn /usr/bin/sudo /bin/umount /bin/su /bin/mount && \
-  chmod g+s /usr/bin/wall /usr/bin/expiry /usr/bin/chage /sbin/unix_chkpwd /sbin/pam_extrausers_chkpwd
-
-#
 # set entrypoint
 ENTRYPOINT /usr/local/share/slurm_gcp_docker/src/docker_entrypoint_controller.sh
 
