@@ -68,7 +68,7 @@ if __name__ == "__main__":
 	]:
 		subprocess.check_call("""
 		  [ ! -d """ + d + " ] && mkdir -p " + d + """ ||
-			echo -n
+			true
 		  """, shell = True, executable = '/bin/bash')
 
 	subprocess.check_call("sudo chown {U}:{U} /mnt/nfs /mnt/nfs/workspace; sudo chown -R {U}:{U} /mnt/nfs/clust*".format(U = pwd.getpwuid(os.getuid()).pw_name),
