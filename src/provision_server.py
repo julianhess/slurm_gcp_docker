@@ -62,6 +62,7 @@ if __name__ == "__main__":
 	for d in [
 	  "/mnt/nfs/clust_conf/slurm",
 	  "/mnt/nfs/clust_conf/canine",
+	  "/mnt/nfs/clust_conf/misc",
 	  "/mnt/nfs/clust_scripts",
 	  "/mnt/nfs/workspace"
 	]:
@@ -73,10 +74,10 @@ if __name__ == "__main__":
 	subprocess.check_call("sudo chown {U}:{U} /mnt/nfs /mnt/nfs/workspace; sudo chown -R {U}:{U} /mnt/nfs/clust*".format(U = pwd.getpwuid(os.getuid()).pw_name),
 	  shell = True, executable = '/bin/bash')
 
-	# Slurm conf. file cgroup.conf can be copied-as is (other conf. files will
-	# need editing below)
+	# Slurm conf. file cgroup.conf and boto conf can be copied-as is
+	# (other conf. files will need editing below)
 	subprocess.check_call(
-	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm".format(
+	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm; cp {CPR}/conf/boto.conf /mnt/nfs/clust_conf/misc".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
 	  ),
 	  shell = True
