@@ -172,3 +172,7 @@ if __name__ == "__main__":
 	  stderr = subprocess.DEVNULL,
 	  executable = '/bin/bash'
 	)
+
+	#
+	# indicate that container is ready
+	subprocess.check_call("sudo touch /.started", shell = True)
