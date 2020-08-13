@@ -12,11 +12,12 @@ timeout 30 stat -t /mnt/nfs &> /dev/null
 EC=$?
 if [[ $EC == 124 ]]; then
 	# attempt to unmount
-	echo "NFS mount is stale; attempting unmount ..." > /dev/stderr
+	echo -n "NFS mount is stale; attempting unmount ..." > /dev/stderr
 	if ! sudo timeout 2 umount -f /mnt/nfs; then
-		echo "Unmount failed. Please close any open files (check with \`lsof -b | grep /mnt/nfs\`) and then \`sudo umount -f /mnt/nfs\`." > /dev/stderr
+		echo -e "\nUnmount failed. Please close any open files (check with \`lsof -b | grep /mnt/nfs\`) and then \`sudo umount -f /mnt/nfs\`." > /dev/stderr
 		exit 1
 	fi
+	echo " success!"
 fi
 
 # otherwise, wait for mount to be ready (NFS server is starting up)
