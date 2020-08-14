@@ -77,7 +77,7 @@ gcloud compute disks list --filter="name=${HOSTNAME}-nfs" --format='csv[no-headi
 # XXX: we assume that this will always be /dev/disk/by-id/google-$HOSTNAME-nfs.
 #      In the future, if we are attaching multiple disks, this might not be the case.
 
-[[ $(lsblk -no FSTYPE /dev/disk/by-id/google-${HOSTNAME}-nfs) == "ext4" ]] || {
+[[ $(blkid -o value -s TYPE /dev/disk/by-id/google-${HOSTNAME}-nfs) == "ext4" ]] || {
 echo -e "\nFormatting disk ...\n"
 sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/disk/by-id/google-${HOSTNAME}-nfs;
 }
