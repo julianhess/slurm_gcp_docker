@@ -2,12 +2,13 @@
 
 import argparse
 import os
+import socket
 import subprocess
 import sys
 
 def parse_args(zone, project):
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--imagename', '-i', help = "Name of image to create")
+	parser.add_argument('--imagename', '-i', help = "Name of image to create", required = True)
 	parser.add_argument('--zone', '-z', help = "Compute zone to create dummy instance in", default = zone)
 	parser.add_argument('--project', '-p', help = "Compute project to create image in", default = project)
 
@@ -34,8 +35,8 @@ if __name__ == "__main__":
 
 	#
 	# get zone of current instance
-	default_zone = subprocess.check_output("""gcloud compute instances list --filter="name=${HOSTNAME}" \
-	  --format='csv[no-heading](zone)'""", shell = True)
+	default_zone = subprocess.check_output("""gcloud compute instances list --filter="name={hostname}" \
+	  --format='csv[no-heading](zone)'""".format(hostname = socket.gethostname()), shell = True)
 
 	#
 	# get current project (if any)
@@ -43,7 +44,7 @@ if __name__ == "__main__":
 
 	#
 	# parse arguments
-	args = parse_args(zone, proj)
+	args = parse_args(default_zone, default_proj)
 	zone = args.zone
 	proj = args.project
 	imagename = args.imagename
