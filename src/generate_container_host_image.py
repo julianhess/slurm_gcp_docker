@@ -14,6 +14,7 @@ def parse_args(zone, project):
 	parser.add_argument('--dummyhost', '-d', help = "Name of dummy VM image gets built on", default = "dummyhost")
 	parser.add_argument('--build_script', '-s', help = "Path to build script whose output is run on the dummy VM", default = "./container_host_image_startup_script.sh")
 	parser.add_argument('--dont_copy_gcloud_credentials', '-g', help = "Skip copying of gcloud credentials", action = "store_false", dest = "copy_gcloud_credentials")
+	parser.add_argument('--image_family', '-f', help = "Family to add image to", default = "slurm-gcp-docker")
 
 	args = parser.parse_args()
 
@@ -111,7 +112,7 @@ if __name__ == "__main__":
 
 			print("Creating image from snapshot ...")
 			subprocess.check_call(
-			  "gcloud compute images create {imagename} --source-snapshot={host}-snap --family slurm-gcp-docker-$USER".format(imagename = imagename, host = host),
+			  "gcloud compute images create {imagename} --source-snapshot={host}-snap --family {image_family}-$USER".format(imagename = imagename, host = host, image_family = args.image_family),
 			  shell = True
 			)
 		finally:
