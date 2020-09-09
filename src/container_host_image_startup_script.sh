@@ -28,7 +28,7 @@ sudo ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 EOF
 
 # make sure shutdown script that tells Slurm controller node is going offline
-# run before the Docker daemon shuts down
+# runs before the Docker daemon shuts down
 echo "[ ! -d /etc/systemd/system/google-shutdown-scripts.service.d ] && \
 sudo mkdir -p /etc/systemd/system/google-shutdown-scripts.service.d; \
 sudo tee /etc/systemd/system/google-shutdown-scripts.service.d/override.conf > /dev/null <<EOF
