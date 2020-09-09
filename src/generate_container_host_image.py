@@ -80,10 +80,10 @@ if __name__ == "__main__":
 		#
 		# copy gcloud config to instance
 		subprocess.check_call("""
-		  gcloud compute scp ~/.config/gcloud/* $HOST:.config/gcloud --zone $ZONE --recurse && \
-		  gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
+		  gcloud compute scp ~/.config/gcloud/* {host}:.config/gcloud --zone {zone} --recurse && \
+		  gcloud compute ssh {host} --zone {zone} -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
 		    "sudo cp -r ~/.config/gcloud /etc/gcloud"
-		  """,
+		  """.format(host = host, zone = zone),
 		  shell = True
 		)
 
@@ -117,6 +117,7 @@ if __name__ == "__main__":
 	#
 	# delete dummy host
 	finally:
+		print("Deleting dummy host ...")
 		subprocess.check_call(
 		  "gcloud compute instances delete {host} --zone {zone} --quiet".format(host = host, zone = zone),
 		  shell = True
