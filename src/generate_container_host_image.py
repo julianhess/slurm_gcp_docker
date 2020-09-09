@@ -13,6 +13,7 @@ def parse_args(zone, project):
 	parser.add_argument('--project', '-p', help = "Compute project to create image in", default = project)
 	parser.add_argument('--dummyhost', '-d', help = "Name of dummy VM image gets built on", default = "dummyhost")
 	parser.add_argument('--build_script', '-s', help = "Path to build script whose output is run on the dummy VM", default = "./container_host_image_startup_script.sh")
+	parser.add_argument('--dont_copy_gcloud_credentials', '-g', help = "Skip copying of gcloud credentials", action = "store_false", dest = "copy_gcloud_credentials")
 
 	args = parser.parse_args()
 
@@ -80,13 +81,15 @@ if __name__ == "__main__":
 
 		#
 		# copy gcloud config to instance
-		subprocess.check_call("""
-		  gcloud compute scp ~/.config/gcloud/* {host}:.config/gcloud --zone {zone} --recurse && \
-		  gcloud compute ssh {host} --zone {zone} -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
-		    "sudo cp -r ~/.config/gcloud /etc/gcloud"
-		  """.format(host = host, zone = zone),
-		  shell = True
-		)
+		if args.copy_gcloud_credentials:
+			print("Copying gcloud credentials to dummy host ...")
+			subprocess.check_call("""
+			  gcloud compute scp ~/.config/gcloud/* {host}:.config/gcloud --zone {zone} --recurse && \
+			  gcloud compute ssh {host} --zone {zone} -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
+				"sudo cp -r ~/.config/gcloud /etc/gcloud"
+			  """.format(host = host, zone = zone),
+			  shell = True
+			)
 
 		#
 		# shut down dummy instance
