@@ -11,7 +11,7 @@ sudo apt-get -y install nfs-common
 VERSION=$(cat VERSION)
 IVERSION=$(tr . - <<< $VERSION)
 
-./generate_container_host_image.sh slurm-gcp-docker-${IVERSION}-`git rev-parse --short HEAD`-$USER
+./generate_container_host_image.py -i slurm-gcp-docker-${IVERSION}-`git rev-parse --short HEAD`-$USER
 
 sudo docker build -t broadinstitute/slurm_gcp_docker:$VERSION \
   -t broadinstitute/slurm_gcp_docker:latest \
