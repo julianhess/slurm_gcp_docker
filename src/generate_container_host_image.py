@@ -12,6 +12,7 @@ def parse_args(zone, project):
 	parser.add_argument('--zone', '-z', help = "Compute zone to create dummy instance in", default = zone)
 	parser.add_argument('--project', '-p', help = "Compute project to create image in", default = project)
 	parser.add_argument('--dummyhost', '-d', help = "Name of dummy VM image gets built on", default = "dummyhost")
+	parser.add_argument('--build_script', '-s', help = "Path to build script whose output is run on the dummy VM", default = "./container_host_image_startup_script.sh")
 
 	args = parser.parse_args()
 
@@ -60,8 +61,8 @@ if __name__ == "__main__":
 		subprocess.check_call("""gcloud compute --project {proj} instances create {host} --zone {zone} \
 		  --machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20200107 \
 		  --image-project ubuntu-os-cloud --boot-disk-size 50GB --boot-disk-type pd-standard \
-		  --metadata-from-file startup-script=<(./container_host_image_startup_script.sh)""".format(
-			host = host, proj = proj, zone = zone
+		  --metadata-from-file startup-script=<({build_script})""".format(
+			host = host, proj = proj, zone = zone, build_script = args.build_script
 		), shell = True, executable = "/bin/bash")
 
 		#
