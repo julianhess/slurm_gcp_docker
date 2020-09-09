@@ -60,48 +60,56 @@ if __name__ == "__main__":
 		  --image-project ubuntu-os-cloud --boot-disk-size 50GB --boot-disk-type pd-standard \
 		  --metadata-from-file startup-script=<(./container_host_image_startup_script.sh)""".format(
 			host = host, proj = proj, zone = zone
-		)
+		), shell = True)
 
 		#
 		# wait for instance to be ready
 		subprocess.check_call("""
-		echo -n "Waiting for dummy instance to be ready ..."
-		while ! gcloud compute ssh $HOST --zone $ZONE -- -o "UserKnownHostsFile /dev/null" \
-		  "[ -f /started ]" &> /dev/null; do
-			sleep 1
-			echo -n ".";
-		done
-		echo""".format(
+		  echo -n "Waiting for dummy instance to be ready ..."
+		  while ! gcloud compute ssh {host} --zone {zone} -- -o "UserKnownHostsFile /dev/null" \
+		    "[ -f /started ]" &> /dev/null; do
+			  sleep 1
+			  echo -n ".";
+		  done
+		  echo""".format(host = host, zone = zone),
+		  shell = True
 		)
 
 		#
 		# copy gcloud config to instance
-		gcloud compute scp ~/.config/gcloud/* $HOST:.config/gcloud --zone $ZONE --recurse
-		gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
-		  "sudo cp -r ~/.config/gcloud /etc/gcloud"
+		subprocess.check_call("""
+		  gcloud compute scp ~/.config/gcloud/* $HOST:.config/gcloud --zone $ZONE --recurse && \
+		  gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
+		    "sudo cp -r ~/.config/gcloud /etc/gcloud"
+		  """,
+		  shell = True
+		)
 
 		#
 		# shut down dummy instance
 		# (this is to avoid disk caching problems that can arise from imaging a running
 		# instance)
-		gcloud compute instances stop $HOST --zone $ZONE --quiet
+		subprocess.check_call("gcloud compute instances stop {host} --zone {zone} --quiet".format(host = host, zone = zone)
 
 		#
 		# clone base image from dummy host's drive
 		try:
-			echo "Snapshotting dummy host drive ..."
-			gcloud compute disks snapshot $HOST --snapshot-names ${HOST}-snap --zone $ZONE || \
-			  { echo "Error creating snapshot!"; exit 1; }
+			print("Snapshotting dummy host drive ...")
+			subprocess.check_call(
+			  "gcloud compute disks snapshot {host} --snapshot-names {host}-snap --zone {zone}".format(host = host, zone = zone),
+			  shell = True
+			)
 
-			echo "Creating image from snapshot ..."
-			gcloud compute images create $IMAGENAME --source-snapshot=${HOST}-snap --family slurm-gcp-docker-$USER || \
-			  { echo "Error creating image!"; exit 1; }
-
+			print("Creating image from snapshot ...")
+			subprocess.check_call(
+			  "gcloud compute images create {imagename} --source-snapshot={host}-snap --family slurm-gcp-docker-$USER".format(imagename = imagename, host = host),
+			  shell = True
+			)
 		finally:
-			echo "Deleting snapshot ..."
-			gcloud compute snapshots delete ${HOST}-snap --quiet || { echo "Error deleting snapshot!"; exit 1; }
+			print("Deleting snapshot ...")
+			subprocess.check_call("gcloud compute snapshots delete {}-snap --quiet".format(host), shell = True)
 
 	#
 	# delete dummy host
 	finally:
-		gcloud compute instances delete $HOST --zone $ZONE --quiet
+		subprocess.check_call("gcloud compute instances delete {host} --zone {zone} --quiet".format(host = host, zone = zone)
