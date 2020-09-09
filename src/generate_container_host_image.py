@@ -3,6 +3,7 @@
 import argparse
 import os
 import subprocess
+import sys
 
 def parse_args(zone, project):
 	parser = argparse.ArgumentParser()
@@ -25,13 +26,16 @@ def parse_args(zone, project):
 if __name__ == "__main__":
 	#
 	# ensure gcloud is installed
+	try:
+		subprocess.check_call("[ -f ~/.config/gcloud/config_sentinel ]", shell = True)
+	except CalledProcessException:
+		print("gcloud is not configured. Please run `gcloud auth login` and try again.", file = sys.stderr)
+		sys.exit(1)
 
 	#
 	# get zone of current instance
 	default_zone = subprocess.check_output("""gcloud compute instances list --filter="name=${HOSTNAME}" \
 	  --format='csv[no-heading](zone)'""", shell = True)
-
-# TODO: allow user to specify zone; validate this, e.g.
 
 	#
 	# get current project (if any)
@@ -42,59 +46,62 @@ if __name__ == "__main__":
 	args = parse_args(zone, proj)
 	zone = args.zone
 	proj = args.project
+	imagename = args.imagename
 
 	#
 	# get hostname
 	host = "dummyhost-" + os.environ["USER"]
 
-#
-# get image name
-IMAGENAME=$1
+	#
+	# create dummy instance to build image in
+	try:
+		subprocess.check_call("""gcloud compute --project {proj} instances create {host} --zone {zone} \
+		  --machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20200107 \
+		  --image-project ubuntu-os-cloud --boot-disk-size 50GB --boot-disk-type pd-standard \
+		  --metadata-from-file startup-script=<(./container_host_image_startup_script.sh)""".format(
+			host = host, proj = proj, zone = zone
+		)
 
-#
-# create dummy instance to build image in
-gcloud compute --project $PROJ instances create $HOST --zone $ZONE \
-  --machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20200107 \
-  --image-project ubuntu-os-cloud --boot-disk-size 50GB --boot-disk-type pd-standard \
-  --metadata-from-file startup-script=<(./container_host_image_startup_script.sh)
+		#
+		# wait for instance to be ready
+		subprocess.check_call("""
+		echo -n "Waiting for dummy instance to be ready ..."
+		while ! gcloud compute ssh $HOST --zone $ZONE -- -o "UserKnownHostsFile /dev/null" \
+		  "[ -f /started ]" &> /dev/null; do
+			sleep 1
+			echo -n ".";
+		done
+		echo""".format(
+		)
 
-#
-# wait for instance to be ready
-echo -n "Waiting for dummy instance to be ready ..."
-while ! gcloud compute ssh $HOST --zone $ZONE -- -o "UserKnownHostsFile /dev/null" \
-  "[ -f /started ]" &> /dev/null; do
-	sleep 1
-	echo -n ".";
-done
-echo
+		#
+		# copy gcloud config to instance
+		gcloud compute scp ~/.config/gcloud/* $HOST:.config/gcloud --zone $ZONE --recurse
+		gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
+		  "sudo cp -r ~/.config/gcloud /etc/gcloud"
 
-# TODO: implement a better check for whether gcloud is properly configured
-#       simply checking for the existence of ~/.config/gcloud is insufficient
-#       check .config/gcloud/config_sentinel
-[ -d ~/.config/gcloud ] || { echo "gcloud has not yet been configured. Please run \`gcloud auth login'"; exit 1; }
-gcloud compute scp ~/.config/gcloud/* $HOST:.config/gcloud --zone $ZONE --recurse
-gcloud compute ssh $HOST --zone $ZONE -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
-  "sudo cp -r ~/.config/gcloud /etc/gcloud"
+		#
+		# shut down dummy instance
+		# (this is to avoid disk caching problems that can arise from imaging a running
+		# instance)
+		gcloud compute instances stop $HOST --zone $ZONE --quiet
 
-#
-# shut down dummy instance
-# (this is to avoid disk caching problems that can arise from imaging a running
-# instance)
-gcloud compute instances stop $HOST --zone $ZONE --quiet
+		#
+		# clone base image from dummy host's drive
+		try:
+			echo "Snapshotting dummy host drive ..."
+			gcloud compute disks snapshot $HOST --snapshot-names ${HOST}-snap --zone $ZONE || \
+			  { echo "Error creating snapshot!"; exit 1; }
 
-#
-# clone base image from dummy host's drive
-echo "Snapshotting dummy host drive ..."
-gcloud compute disks snapshot $HOST --snapshot-names ${HOST}-snap --zone $ZONE || \
-  { echo "Error creating snapshot!"; exit 1; }
+			echo "Creating image from snapshot ..."
+			gcloud compute images create $IMAGENAME --source-snapshot=${HOST}-snap --family slurm-gcp-docker-$USER || \
+			  { echo "Error creating image!"; exit 1; }
 
-echo "Creating image from snapshot ..."
-gcloud compute images create $IMAGENAME --source-snapshot=${HOST}-snap --family slurm-gcp-docker-$USER || \
-  { echo "Error creating image!"; exit 1; }
+		finally:
+			echo "Deleting snapshot ..."
+			gcloud compute snapshots delete ${HOST}-snap --quiet || { echo "Error deleting snapshot!"; exit 1; }
 
-echo "Deleting snapshot/template disk ..."
-gcloud compute snapshots delete ${HOST}-snap --quiet || { echo "Error deleting snapshot!"; exit 1; }
-
-#
-# delete dummy host
-gcloud compute instances delete $HOST --zone $ZONE --quiet
+	#
+	# delete dummy host
+	finally:
+		gcloud compute instances delete $HOST --zone $ZONE --quiet
