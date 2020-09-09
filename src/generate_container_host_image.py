@@ -11,6 +11,7 @@ def parse_args(zone, project):
 	parser.add_argument('--imagename', '-i', help = "Name of image to create", required = True)
 	parser.add_argument('--zone', '-z', help = "Compute zone to create dummy instance in", default = zone)
 	parser.add_argument('--project', '-p', help = "Compute project to create image in", default = project)
+	parser.add_argument('--dummyhost', '-d', help = "Name of dummy VM image gets built on", default = "dummyhost")
 
 	args = parser.parse_args()
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
 
 	#
 	# get hostname
-	host = "dummyhost-" + os.environ["USER"]
+	host = args.dummyhost + "-" + os.environ["USER"]
 
 	#
 	# create dummy instance to build image in
