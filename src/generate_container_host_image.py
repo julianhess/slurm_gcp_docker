@@ -37,11 +37,11 @@ if __name__ == "__main__":
 	#
 	# get zone of current instance
 	default_zone = subprocess.check_output("""gcloud compute instances list --filter="name={hostname}" \
-	  --format='csv[no-heading](zone)'""".format(hostname = socket.gethostname()), shell = True)
+	  --format='csv[no-heading](zone)'""".format(hostname = socket.gethostname()), shell = True).decode().rstrip()
 
 	#
 	# get current project (if any)
-	default_proj = subprocess.check_output("gcloud config list --format='value(core.project)'", shell = True)
+	default_proj = subprocess.check_output("gcloud config list --format='value(core.project)'", shell = True).decode().rstrip()
 
 	#
 	# parse arguments
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 		  --image-project ubuntu-os-cloud --boot-disk-size 50GB --boot-disk-type pd-standard \
 		  --metadata-from-file startup-script=<(./container_host_image_startup_script.sh)""".format(
 			host = host, proj = proj, zone = zone
-		), shell = True)
+		), shell = True, executable = "/bin/bash")
 
 		#
 		# wait for instance to be ready
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 			  echo -n ".";
 		  done
 		  echo""".format(host = host, zone = zone),
-		  shell = True
+		  shell = True, executable = "/bin/bash"
 		)
 
 		#
