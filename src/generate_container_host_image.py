@@ -89,7 +89,10 @@ if __name__ == "__main__":
 		# shut down dummy instance
 		# (this is to avoid disk caching problems that can arise from imaging a running
 		# instance)
-		subprocess.check_call("gcloud compute instances stop {host} --zone {zone} --quiet".format(host = host, zone = zone)
+		subprocess.check_call(
+		  "gcloud compute instances stop {host} --zone {zone} --quiet".format(host = host, zone = zone),
+		  shell = True
+		)
 
 		#
 		# clone base image from dummy host's drive
@@ -112,4 +115,7 @@ if __name__ == "__main__":
 	#
 	# delete dummy host
 	finally:
-		subprocess.check_call("gcloud compute instances delete {host} --zone {zone} --quiet".format(host = host, zone = zone)
+		subprocess.check_call(
+		  "gcloud compute instances delete {host} --zone {zone} --quiet".format(host = host, zone = zone),
+		  shell = True
+		)
