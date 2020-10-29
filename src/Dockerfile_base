@@ -52,6 +52,18 @@ ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 ARG cache_invalidate=30
 RUN git clone https://github.com/getzlab/slurm_gcp_docker /usr/local/share/slurm_gcp_docker
 
+# 10. podman
+RUN apt-get -qq -y install gnupg && \
+. /etc/os-release && \
+curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key | apt-key add - && \
+echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list && \
+apt-get -qq update && \
+apt-get -qq -y install fuse-overlayfs podman iptables && \
+DEBIAN_FRONTEND=noninteractive \
+apt-get -qq -y install --no-install-recommends tzdata
+
+COPY podman_conf/* /etc/containers/
+
 #
 # clean up /tmp
 RUN rm -rf *
