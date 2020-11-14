@@ -21,7 +21,7 @@ sudo update-grub && \
 # INSTALL GCLOUD
 [ ! -d ~$USER/.config/gcloud ] && sudo -u $USER mkdir -p ~$USER/.config/gcloud
 sudo mkdir /gcsdk && \
-sudo wget -O gcs.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-272.0.0-linux-x86_64.tar.gz && \
+sudo wget -O gcs.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-318.0.0-linux-x86_64.tar.gz && \
 sudo tar xzf gcs.tgz -C /gcsdk && \
 sudo /gcsdk/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet && \
 sudo ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
