@@ -29,11 +29,16 @@ hosts = subprocess.check_output("scontrol show hostnames {}".format(sys.argv[1])
 # XXX: gcloud assumes that sys.stdin will always be not None, so we need to pass
 #      dummy stdin (/dev/null)
 for machine_type, host_list in node_LuT.loc[hosts].groupby("machine_type"):
-	subprocess.check_call(
+	host_table = subprocess.Popen(
 	  """gcloud compute instances create {HOST_LIST} --image {image} \
 	     --machine-type {MT} --zone {compute_zone} {compute_script} {preemptible} \
-	     --tags caninetransientimage
+	     --tags caninetransientimage --format 'csv(name,networkInterfaces[0].networkIP)'
 	  """.format(
 	    HOST_LIST = " ".join(host_list.index), MT = machine_type, **k9_backend_conf
-	  ), shell = True, executable = '/bin/bash', stdin = subprocess.DEVNULL
+	  ), shell = True, executable = '/bin/bash', stdin = subprocess.DEVNULL, stdout = subprocess.PIPE
 	)
+
+	# update DNS (hostname -> internal IP)
+	host_table = pd.read_csv(host_table.stdout)
+	for _, name, ip in host_table.itertuples():
+		subprocess.check_call("scontrol update nodename={} nodeaddr={}".format(name, ip), shell = True)
