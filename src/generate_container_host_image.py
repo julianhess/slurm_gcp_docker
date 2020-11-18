@@ -33,7 +33,7 @@ if __name__ == "__main__":
 	# ensure gcloud is installed
 	try:
 		subprocess.check_call("[ -f ~/.config/gcloud/config_sentinel ]", shell = True)
-	except CalledProcessException:
+	except subprocess.CalledProcessError:
 		print("gcloud is not configured. Please run `gcloud auth login` and try again.", file = sys.stderr)
 		sys.exit(1)
 
