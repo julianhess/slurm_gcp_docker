@@ -80,7 +80,7 @@ if __name__ == "__main__":
 	# Slurm conf. file cgroup.conf and boto conf can be copied-as is
 	# (other conf. files will need editing below)
 	subprocess.check_call(
-	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm; cp {CPR}/conf/boto.conf /mnt/nfs/clust_conf/misc".format(
+	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm; cp {CPR}/conf/boto.conf /mnt/nfs/clust_conf/misc; cp {CPR}/src/containerimages.conf /mnt/nfs/clust_conf/misc/containerimages.conf".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
 	  ),
 	  shell = True
@@ -143,6 +143,13 @@ if __name__ == "__main__":
 	C["DbdHost"] = ctrl_hostname
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurmdbd.conf")
+
+        #
+        # Pull readonly container images. If those images already exist, it should be fast.
+        subprocess.check_call("""
+            cat /mnt/nfs/clust_conf/misc/containerimages.conf | grep '^=' | sed 's/^=//' | xargs -L1 sudo podman --root /mnt/nfs/clust_containers pull
+            """, shell=True, executable = '/bin/bash'
+        )
 
 	#
 	# start Slurm controller
