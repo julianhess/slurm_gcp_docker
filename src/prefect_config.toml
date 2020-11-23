@@ -1,0 +1,12 @@
+
+## This file will be read when prefect is imported
+
+additionalimagestores = ["/mnt/nfs/clust_containers"]
+backend = "server"
+
+# output_dir_stem = "/mnt/nfs/workspace"
+# use_podman = true
+#
+# [canine_backend_conf]
+# type = "LocalDocker"
+

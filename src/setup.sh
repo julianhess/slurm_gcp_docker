@@ -13,6 +13,10 @@ IVERSION=$(tr . - <<< $VERSION)
 
 ./generate_container_host_image.py -i slurm-gcp-docker-${IVERSION}-`git rev-parse --short HEAD`-$USER
 
+# copy prefect config, this will be read by prefect when it is imported
+mkdir -p ~/.prefect
+cp prefect_config.toml ~/.prefect/config.toml
+
 sudo docker build -t broadinstitute/slurm_gcp_docker:$VERSION \
   -t broadinstitute/slurm_gcp_docker:latest \
   --build-arg HOST_USER=$USER --build-arg UID=$UID --build-arg GID=$(id -g) .
