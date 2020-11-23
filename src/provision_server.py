@@ -80,7 +80,7 @@ if __name__ == "__main__":
 	# Slurm conf. file cgroup.conf and boto conf can be copied-as is
 	# (other conf. files will need editing below)
 	subprocess.check_call(
-	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm; cp {CPR}/conf/boto.conf /mnt/nfs/clust_conf/misc; cp {CPR}/conf/containerimages.conf /mnt/nfs/clust_conf/misc/containerimages.conf".format(
+	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm; cp {CPR}/conf/boto.conf /mnt/nfs/clust_conf/misc; cp {CPR}/src/containerimages.conf /mnt/nfs/clust_conf/misc/containerimages.conf".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
 	  ),
 	  shell = True

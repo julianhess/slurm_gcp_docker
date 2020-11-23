@@ -11,3 +11,8 @@ RUN groupadd -g $GID $HOST_USER && adduser --gid $GID -u $UID --gecos "" \
   --disabled-password $HOST_USER && \
 adduser $HOST_USER sudo && groupadd -g 1338 docker && adduser $HOST_USER docker && \
 ssed -i '/^%sudo/s/ALL$/NOPASSWD:ALL/' /etc/sudoers
+
+# Update containerimages.conf in case of the file is modified manually.
+# On slurm worker, they should be same. On controller, it might be different if user adds new images to the conf file before running setup.sh.
+RUN rm /usr/local/share/slurm_gcp_docker/src/containerimages.conf
+COPY containerimages.conf /usr/local/share/slurm_gcp_docker/src/
