@@ -12,6 +12,7 @@ node_LuT = pd.read_pickle("/mnt/nfs/clust_conf/slurm/host_LuT.pickle")
 # load Canine backend configuration
 with open("/mnt/nfs/clust_conf/canine/backend_conf.pickle", "rb") as f:
 	k9_backend_conf = pickle.load(f)
+default_preemptible_flag = k9_backend_conf['preemptible'] # this is '--preemptible' or ''
 
 # for some reason, the USER environment variable is set to root when this
 # script is run, even though it's run under user slurm ...
@@ -28,7 +29,15 @@ hosts = subprocess.check_output("scontrol show hostnames {}".format(sys.argv[1])
 # create all the nodes of each machine type at once
 # XXX: gcloud assumes that sys.stdin will always be not None, so we need to pass
 #      dummy stdin (/dev/null)
-for machine_type, host_list in node_LuT.loc[hosts].groupby("machine_type"):
+for key, host_list in node_LuT.loc[hosts].groupby(["machine_type", "preemptible"]):
+        machine_type, not_nonpreemptible_part = key
+
+        # override 'preemptible' flag if this node is in the "non-preemptible" partition
+        if not not_nonpreemptible_part:
+            k9_backend_conf['preemptible'] = ''
+        else:
+            k9_backend_conf['preemptible'] = default_preemptible_flag
+
 	host_table = subprocess.Popen(
 	  """gcloud compute instances create {HOST_LIST} --image {image} \
 	     --machine-type {MT} --zone {compute_zone} {compute_script} {preemptible} \
