@@ -30,13 +30,13 @@ hosts = subprocess.check_output("scontrol show hostnames {}".format(sys.argv[1])
 # XXX: gcloud assumes that sys.stdin will always be not None, so we need to pass
 #      dummy stdin (/dev/null)
 for key, host_list in node_LuT.loc[hosts].groupby(["machine_type", "preemptible"]):
-        machine_type, not_nonpreemptible_part = key
+	machine_type, not_nonpreemptible_part = key
 
-        # override 'preemptible' flag if this node is in the "non-preemptible" partition
-        if not not_nonpreemptible_part:
-            k9_backend_conf['preemptible'] = ''
-        else:
-            k9_backend_conf['preemptible'] = default_preemptible_flag
+	# override 'preemptible' flag if this node is in the "non-preemptible" partition
+	if not not_nonpreemptible_part:
+	    k9_backend_conf['preemptible'] = ''
+	else:
+	    k9_backend_conf['preemptible'] = default_preemptible_flag
 
 	host_table = subprocess.Popen(
 	  """gcloud compute instances create {HOST_LIST} --image {image} \
