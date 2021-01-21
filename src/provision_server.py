@@ -122,8 +122,8 @@ if __name__ == "__main__":
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
-        nonstandardparts = ["all", "default", "nonpreemptible"]
-        nonpreemptible_range = range(3501, 3600 + 1)
+	nonstandardparts = ["all", "default", "nonpreemptible"]
+	nonpreemptible_range = range(3501, 3600 + 1)
 
 	#
 	# save node lookup table
