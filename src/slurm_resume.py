@@ -47,7 +47,8 @@ for key, host_list in node_LuT.loc[hosts].groupby(["machine_type", "preemptible"
 	  ), shell = True, executable = '/bin/bash', stdin = subprocess.DEVNULL, stdout = subprocess.PIPE
 	)
 
-	# update DNS (hostname -> internal IP) # Question: Why do we need this?
+	# update DNS (hostname -> internal IP)
+	# TODO: replace this with SlurmctldParameters=cloud_dns in slurm.conf
 	host_table = pd.read_csv(host_table.stdout)
 	for _, name, ip in host_table.itertuples():
 		subprocess.check_call("scontrol update nodename={} nodeaddr={}".format(name, ip), shell = True)
