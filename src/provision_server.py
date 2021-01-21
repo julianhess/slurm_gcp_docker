@@ -98,7 +98,7 @@ if __name__ == "__main__":
 	# slurm.conf
 	C = parse_slurm_conf("{CPR}/conf/slurm.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
 	C[["ControlMachine", "ControlAddr", "AccountingStorageHost"]] = ctrl_hostname
-	C["SuspendExcNodes"] = ctrl_hostname + "-nfs"
+	del C["SuspendExcNodes"]
 
 	# node definitions
 	C["NodeName8"] = "{HN}-worker[1-100] CPUs=8 RealMemory=28000 State=CLOUD Weight=3".format(HN = ctrl_hostname)
@@ -106,7 +106,6 @@ if __name__ == "__main__":
 	C["NodeName4"] = "{HN}-worker[2001-3000] CPUs=4 RealMemory=23000 State=CLOUD Weight=4".format(HN = ctrl_hostname)
 	C["NodeName88"] = "{HN}-worker[3001-3500] CPUs=8 RealMemory=50000 State=CLOUD Weight=4".format(HN = ctrl_hostname)
 	C["NodeName89"] = "{HN}-worker[3501-3600] CPUs=8 RealMemory=50000 State=CLOUD Weight=4".format(HN = ctrl_hostname) # non-preemptible
-	C["NodeName99"] = "{HN}-nfs CPUs=4 RealMemory=14000 Weight=1".format(HN = ctrl_hostname)
 
 	# partition definitions
 	C["PartitionName"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
@@ -115,10 +114,9 @@ if __name__ == "__main__":
 	C["PartitionName4"] = "n1-highmem-4 Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
 	C["PartitionName88"] = "n1-highmem-8 Nodes={HN}-worker[3001-3500]".format(HN = ctrl_hostname)
 	C["PartitionName89"] = "n1-highmem-8 Nodes={HN}-worker[3501-3600]".format(HN = ctrl_hostname)
-	C["PartitionName99"] = "nfs Nodes={HN}-nfs".format(HN = ctrl_hostname)
-	C["PartitionName888"] = "default Nodes={HN}-nfs,{HN}-worker[1-3500] Default=YES".format(HN = ctrl_hostname) # Default partition, preemptible
+	C["PartitionName888"] = "default Nodes={HN}-worker[1-3500] Default=YES".format(HN = ctrl_hostname) # Default partition, preemptible
 	C["PartitionName889"] = "nonpreemptible Nodes={HN}-worker[3501-3600] Default=NO".format(HN = ctrl_hostname) # Non-preemptible partition
-	C["PartitionName999"] = "all Nodes={HN}-nfs,{HN}-worker[1-3600] Default=NO".format(HN = ctrl_hostname)
+	C["PartitionName999"] = "all Nodes={HN}-worker[1-3600] Default=NO".format(HN = ctrl_hostname)
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
