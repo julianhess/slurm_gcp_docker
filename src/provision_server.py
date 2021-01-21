@@ -50,10 +50,7 @@ if __name__ == "__main__":
 
 	#
 	# mount NFS server
-	subprocess.check_call("{CPR}/src/nfs_provision_worker.sh {HN}-nfs".format(
-	  CPR = shlex.quote(CLUST_PROV_ROOT),
-	  HN = ctrl_hostname
-	), shell = True)
+	# Now controller serves as the NFS, so we don't need to mount NFS
 
 	#
 	# copy common files to NFS
