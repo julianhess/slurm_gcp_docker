@@ -50,9 +50,9 @@ tar xzf gcs.tgz -C /gcsdk && \
 /gcsdk/google-cloud-sdk/install.sh --usage-reporting false --path-update true --quiet && \
 ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 
-# 9. get cluster utility scripts
-ARG cache_invalidate=30
-RUN git clone https://github.com/getzlab/slurm_gcp_docker /usr/local/share/slurm_gcp_docker
+# 9. get cluster utility scripts (TODO: better moving Dockerfile_base to parent directory??)
+COPY ./src/ /usr/local/share/slurm_gcp_docker/src/
+COPY ./conf/ /usr/local/share/slurm_gcp_docker/conf/
 
 # 10. podman
 RUN apt-get -qq -y install gnupg && \
@@ -64,7 +64,13 @@ apt-get -qq -y install fuse-overlayfs podman iptables && \
 DEBIAN_FRONTEND=noninteractive \
 apt-get -qq -y install --no-install-recommends tzdata
 
-COPY podman_conf/* /etc/containers/
+COPY src/podman_conf/* /etc/containers/
+
+# 11. sudo for all
+RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
+
+# 12. docker for all (NOTE: we have moved to podman so nested docker or sharing docker daemon is no long required)
+# RUN chmod 666 /var/run/docker.sock
 
 #
 # clean up /tmp

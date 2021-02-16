@@ -5,6 +5,8 @@ import os
 import socket
 import subprocess
 import sys
+import shlex
+import tempfile
 
 def parse_args(zone, project):
 	parser = argparse.ArgumentParser()
@@ -27,6 +29,13 @@ def parse_args(zone, project):
 	# fi
 
 	return args
+
+def get_slurm_gcp_docker_root():
+	# I placed a marker file ".slurm_gcp_docker_root"
+	src_dir = os.path.dirname(__file__)
+	src_parent = os.path.abspath(os.path.join(src_dir, os.path.pardir))
+	assert os.path.exists(os.path.join(src_parent, ".slurm_gcp_docker_root"))
+	return src_parent
 
 if __name__ == "__main__":
 	#
@@ -93,6 +102,35 @@ if __name__ == "__main__":
 			)
 
 		#
+		# copy slurm_gcp_docker source to instance and build docker there
+		print("Copying slurm_gcp_docker source to dummy host ...")
+		subprocess.check_call(
+			"gcloud compute scp {src} {host}:tmp_slurm_gcp_docker --zone {zone} --recurse".format(
+				src=shlex.quote(get_slurm_gcp_docker_root()), host = host, zone = zone
+			),
+			shell=True
+		)
+
+		#
+		# transfer docker image there
+		print("Transfering slurm docker image to dummy host ...")
+		DOCKER_SRC = open("DOCKER_SRC").read().rstrip()
+		VERSION = open("VERSION").read().rstrip()
+
+		tmp = tempfile.mktemp()
+		subprocess.check_call("sudo docker save {}:{} > {}".format(DOCKER_SRC, VERSION, tmp), shell=True)
+		subprocess.check_call("gcloud compute scp {src} {host}:tmp_docker_file --zone {zone}".format(src=tmp, host=host, zone=zone), shell=True)
+		os.remove(tmp)
+
+		#
+		# run post startup script
+		subprocess.check_call(
+			'gcloud compute ssh {host} --zone {zone} -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
+				"sudo cp -r ~/tmp_slurm_gcp_docker/ /usr/local/share/slurm_gcp_docker/ && cd /usr/local/share/slurm_gcp_docker/src/ && ./container_host_image_startup_script_post.sh"'.format(host = host, zone = zone),
+			shell=True
+		)
+
+		#
 		# shut down dummy instance
 		# (this is to avoid disk caching problems that can arise from imaging a running
 		# instance)
@@ -111,6 +149,10 @@ if __name__ == "__main__":
 			)
 
 			print("Creating image from snapshot ...")
+			try:
+				subprocess.check_call("gcloud compute images delete --quiet {imagename}".format(imagename = imagename), shell = True)
+			except subprocess.CalledProcessError:
+				pass
 			subprocess.check_call(
 			  "gcloud compute images create {imagename} --source-snapshot={host}-snap --family {image_family}-$USER".format(imagename = imagename, host = host, image_family = args.image_family),
 			  shell = True
