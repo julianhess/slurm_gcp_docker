@@ -7,9 +7,10 @@
 # add { "experimental": true } to /etc/docker/daemon.json
 
 VERSION=$(cat VERSION)
+(cd .. &&
 sudo docker build --squash -t broadinstitute/slurm_gcp_docker_base:$VERSION \
   -t broadinstitute/slurm_gcp_docker_base:latest \
-  -f Dockerfile_base .
+  -f src/Dockerfile_base .)
 
 # This can then be pushed to a container repo, e.g. gcr.io:
 #
