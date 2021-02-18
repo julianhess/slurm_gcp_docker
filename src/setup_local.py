@@ -7,6 +7,7 @@ def error(msg, dedent=True):
         msg = textwrap.dedent(msg)
     msg = re.sub("\\n+", "", msg, re.MULTILINE)
     print(msg)
+    print("Please refer https://github.com/getzlab/wolF/wiki/Setup for complete setup instructions")
     sys.exit(1)
 
 def check_gcloud_auth():
