@@ -60,7 +60,6 @@ if __name__ == "__main__":
 	  "/mnt/nfs/clust_conf/slurm",
 	  "/mnt/nfs/clust_conf/canine",
 	  "/mnt/nfs/clust_conf/misc",
-	  "/mnt/nfs/clust_scripts",
 	  "/mnt/nfs/workspace"
 	]:
 		subprocess.check_call("""
@@ -80,12 +79,6 @@ if __name__ == "__main__":
 	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm; cp {CPR}/conf/boto.conf /mnt/nfs/clust_conf/misc".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
 	  ),
-	  shell = True
-	)
-
-	# scripts
-	subprocess.check_call(
-	  "cp -r {CPR}/src/* /mnt/nfs/clust_scripts".format(CPR = shlex.quote(CLUST_PROV_ROOT)),
 	  shell = True
 	)
 
