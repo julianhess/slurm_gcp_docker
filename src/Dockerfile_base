@@ -19,9 +19,10 @@ ln -s /usr/bin/pip3 /usr/bin/pip && \
 mkdir -p /mnt/nfs
 
 # 3. build Slurm
-RUN wget https://download.schedmd.com/slurm/slurm-19.05.3-2.tar.bz2 && \
-tar xjf slurm-19.05.3-2.tar.bz2 && \
-cd slurm-19.05.3-2 && \
+
+RUN wget https://download.schedmd.com/slurm/slurm-20.11.4.tar.bz2 && \
+tar xjf slurm-20.11.4.tar.bz2 && \
+cd slurm-20.11.4 && \
 ./configure --prefix=/usr/local --sysconfdir=/usr/local/etc \
   --with-mysql_config=/usr/bin --with-hdf5=no && \
 make && make install
@@ -83,10 +84,6 @@ RUN apt-get -y remove build-essential vim git && apt-get -y autoremove
 #
 # set entrypoint
 ENTRYPOINT /usr/local/share/slurm_gcp_docker/src/docker_entrypoint_controller.sh
-
-#
-# set Slurm environment
-ENV SLURM_CONF "/mnt/nfs/clust_conf/slurm/slurm.conf"
 
 #
 # update PATH environment
