@@ -105,7 +105,7 @@ if __name__ == "__main__":
 		# copy slurm_gcp_docker source to instance and build docker there
 		print("Copying slurm_gcp_docker source to dummy host ...")
 		subprocess.check_call(
-			"gcloud compute scp {src} {host}:tmp_slurm_gcp_docker --zone {zone} --recurse".format(
+			"gcloud compute scp {src} {host}:/tmp/tmp_slurm_gcp_docker --zone {zone} --recurse".format(
 				src=shlex.quote(get_slurm_gcp_docker_root()), host = host, zone = zone
 			),
 			shell=True
@@ -119,15 +119,28 @@ if __name__ == "__main__":
 
 		tmp = tempfile.mktemp()
 		subprocess.check_call("sudo docker save {}:{} > {}".format(DOCKER_SRC, VERSION, tmp), shell=True)
-		subprocess.check_call("gcloud compute scp {src} {host}:tmp_docker_file --zone {zone}".format(src=tmp, host=host, zone=zone), shell=True)
+		subprocess.check_call("gcloud compute scp {src} {host}:/tmp/tmp_docker_file --zone {zone}".format(src=tmp, host=host, zone=zone), shell=True)
 		os.remove(tmp)
 
 		#
-		# run post startup script
+		# mark data transferred
 		subprocess.check_call(
 			'gcloud compute ssh {host} --zone {zone} -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T \
-				"sudo cp -r ~/tmp_slurm_gcp_docker/ /usr/local/share/slurm_gcp_docker/ && cd /usr/local/share/slurm_gcp_docker/src/ && ./container_host_image_startup_script_post.sh"'.format(host = host, zone = zone),
+				"sudo cp -r /tmp/tmp_slurm_gcp_docker/ /usr/local/share/slurm_gcp_docker/ && sudo touch /data_transferred"'.format(host = host, zone = zone),
 			shell=True
+		)
+
+		#
+		# wait for startup script to be completed
+		subprocess.check_call("""
+		  echo -n "Waiting for dummy instance completing startup script ..."
+		  while ! gcloud compute ssh {host} --zone {zone} -- -o "UserKnownHostsFile /dev/null" \
+		    "[ -f /completed ]" &> /dev/null; do
+			  sleep 1
+			  echo -n ".";
+		  done
+		  echo""".format(host = host, zone = zone),
+		  shell = True, executable = "/bin/bash"
 		)
 
 		#
