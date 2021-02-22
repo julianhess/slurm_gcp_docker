@@ -72,10 +72,10 @@ if __name__ == "__main__":
 	# delete any preexisting configuration files
 	subprocess.check_call("find /mnt/nfs/clust_conf -type f -exec rm -f {} +", shell = True)
 
-	# Slurm conf. file cgroup.conf and boto conf can be copied-as is
+	# Slurm conf. file cgroup.conf can be copied-as is
 	# (other conf. files will need editing below)
 	subprocess.check_call(
-	  "cp {CPR}/conf/cgroup.conf /mnt/nfs/clust_conf/slurm".format(
+	  "cp {CPR}/conf/cgroup.conf /usr/local/etc/".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
 	  ),
 	  shell = True
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 	C["PartitionName889"] = "nonpreemptible Nodes={HN}-worker[3501-3600] Default=NO".format(HN = ctrl_hostname) # Non-preemptible partition
 	C["PartitionName999"] = "all Nodes={HN}-worker[1-3600] Default=NO".format(HN = ctrl_hostname)
 
-	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
+	print_conf(C, "/usr/local/etc/slurm.conf")
 
 	nonstandardparts = ["all", "main", "nonpreemptible"]
 	nonpreemptible_range = range(3501, 3600 + 1)
@@ -136,7 +136,7 @@ if __name__ == "__main__":
 	C = parse_slurm_conf("{CPR}/conf/slurmdbd.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
 	C["DbdHost"] = ctrl_hostname
 
-	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurmdbd.conf")
+	print_conf(C, "/usr/local/etc/slurmdbd.conf")
 
 	#
 	# start Slurm controller
@@ -149,7 +149,6 @@ if __name__ == "__main__":
 	    echo -n "."
 	  done
 	  echo
-	  export SLURM_CONF={conf_path};
 	  pgrep slurmdbd || sudo -E slurmdbd;
 	  echo -n "Waiting for database to be ready ..."
 	  while ! sacctmgr -i list cluster &> /dev/null; do
@@ -158,10 +157,10 @@ if __name__ == "__main__":
 	  done
 	  echo
 	  sudo -E sacctmgr -i add cluster cluster
-	  pgrep slurmctld || sudo -E slurmctld -c -f {conf_path} &&
+	  pgrep slurmctld || sudo -E slurmctld -c &&
 	    sudo -E slurmctld reconfigure;
 	  pgrep munged || sudo -E munged -f
-	  """.format(conf_path = "/mnt/nfs/clust_conf/slurm/slurm.conf"),
+	  """.format(conf_path = "/usr/local/etc/slurm.conf"),
 	  shell = True,
 	  stderr = subprocess.DEVNULL,
 	  executable = '/bin/bash'
