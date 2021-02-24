@@ -113,7 +113,7 @@ if __name__ == "__main__":
 	C["PartitionName1"] = "n1-standard-1 Nodes={HN}-worker[101-2000]".format(HN = ctrl_hostname)
 	C["PartitionName4"] = "n1-highmem-4 Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
 	C["PartitionName88"] = "n1-highmem-8 Nodes={HN}-worker[3001-3500]".format(HN = ctrl_hostname)
-	C["PartitionName89"] = "n1-highmem-8 Nodes={HN}-worker[3501-3600]".format(HN = ctrl_hostname)
+	C["PartitionName89"] = "n1-highmem-8-nonp Nodes={HN}-worker[3501-3600]".format(HN = ctrl_hostname)
 	C["PartitionName888"] = "main Nodes={HN}-worker[1-3500] Default=YES".format(HN = ctrl_hostname) # Default partition, preemptible
 	C["PartitionName889"] = "nonpreemptible Nodes={HN}-worker[3501-3600] Default=NO".format(HN = ctrl_hostname) # Non-preemptible partition
 	C["PartitionName999"] = "all Nodes={HN}-worker[1-3600] Default=NO".format(HN = ctrl_hostname)
