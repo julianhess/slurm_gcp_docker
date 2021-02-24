@@ -3,6 +3,7 @@
 import argparse
 import io
 import os
+import tempfile
 import pwd
 import pandas as pd
 import re
@@ -34,12 +35,16 @@ def parse(X, regex, fields):
 	return T
 
 def print_conf(D, path):
-	with open(path, "w") as f:
+	## Write to temp location and "sudo mv" to path
+	tmpfile = tempfile.mktemp()
+	with open(tmpfile, "w") as f:
 		for r in D.iteritems():
 			f.write("{k}={v}\n".format(
 			  k = re.sub(r"^(NodeName|PartitionName)\d+$", r"\1", r[0]),
 			  v = r[1]
 			))
+	subprocess.check_call(["sudo", "cp", tmpfile, path])
+	os.remove(tmpfile)
 
 if __name__ == "__main__":
 	CLUST_PROV_ROOT = os.environ["CLUST_PROV_ROOT"] if "CLUST_PROV_ROOT" in os.environ \
@@ -75,7 +80,7 @@ if __name__ == "__main__":
 	# Slurm conf. file cgroup.conf can be copied-as is
 	# (other conf. files will need editing below)
 	subprocess.check_call(
-	  "cp {CPR}/conf/cgroup.conf /usr/local/etc/".format(
+	  "sudo cp {CPR}/conf/cgroup.conf /usr/local/etc/cgroup.conf".format(
 	    CPR = shlex.quote(CLUST_PROV_ROOT)
 	  ),
 	  shell = True
@@ -136,6 +141,8 @@ if __name__ == "__main__":
 	C["DbdHost"] = ctrl_hostname
 
 	print_conf(C, "/usr/local/etc/slurmdbd.conf")
+	subprocess.check_call(["sudo", "chown", "slurm:slurm", "/usr/local/etc/slurmdbd.conf"])
+	subprocess.check_call(["sudo", "chmod", "600", "/usr/local/etc/slurmdbd.conf"])
 
 	#
 	# start Slurm controller

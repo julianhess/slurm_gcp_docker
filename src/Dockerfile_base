@@ -54,6 +54,7 @@ ln -s /gcsdk/google-cloud-sdk/bin/* /usr/bin
 # 9. get cluster utility scripts (TODO: better moving Dockerfile_base to parent directory??)
 COPY ./src/ /usr/local/share/slurm_gcp_docker/src/
 COPY ./conf/ /usr/local/share/slurm_gcp_docker/conf/
+RUN chmod -R g-w /usr/local/share/slurm_gcp_docker/src/ && chmod -R a-w /usr/local/share/slurm_gcp_docker/src/
 
 # 10. podman
 RUN apt-get -qq -y install gnupg && \
