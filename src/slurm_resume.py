@@ -5,20 +5,23 @@ import os
 import sys
 import subprocess
 import pickle
-import json
 
 # load node machine type lookup table
 node_LuT = pd.read_pickle("/mnt/nfs/clust_conf/slurm/host_LuT.pickle")
 
-## canine backend config is passed to docker via environment variables with prefix "BACKEND_CONFIG__"
-## and saved as file.
-def load_canine_backend_conf():
-	with open("/usr/local/etc/canine_backend_conf.json", "r") as f:
-		conf = json.load(f)
-	return conf
+## canine backend config is passed via environments with prefix "BACKEND_CONFIG__"
+def parse_canine_conf_from_env():
+	config = {}
+	for k, v in os.environ.items():
+		if k.startswith("BACKEND_CONFIG__"):
+			key = k[len("BACKEND_CONFIG__"):]
+			config[key] = v
+	return config
 
 # load Canine backend configuration
-k9_backend_conf = load_canine_backend_conf()
+#with open("/mnt/nfs/clust_conf/canine/backend_conf.pickle", "rb") as f:
+#	k9_backend_conf = pickle.load(f)
+k9_backend_conf = parse_canine_conf_from_env()
 default_preemptible_flag = k9_backend_conf['preemptible'] # this is '--preemptible' or ''
 
 # for some reason, the USER environment variable is set to root when this
