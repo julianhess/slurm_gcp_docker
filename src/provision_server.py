@@ -4,7 +4,6 @@ import argparse
 import io
 import os
 import tempfile
-import json
 import pwd
 import pandas as pd
 import re
@@ -13,15 +12,6 @@ import socket
 import subprocess
 # sys.path.append("/home/jhess/j/proj/") # TODO: remove this line when Capy is a package
 # from capy import txt
-
-## canine backend config is passed via environments with prefix "BACKEND_CONFIG__"
-def parse_canine_conf_from_env():
-	config = {}
-	for k, v in os.environ.items():
-		if k.startswith("BACKEND_CONFIG__"):
-			key = k[len("BACKEND_CONFIG__"):]
-			config[key] = v
-	return config
 
 def parse_slurm_conf(path):
 	output = io.StringIO()
@@ -145,15 +135,6 @@ if __name__ == "__main__":
 	nodes = pd.concat(nodes).set_index("idx")
 
 	nodes.to_pickle("/mnt/nfs/clust_conf/slurm/host_LuT.pickle")
-
-	#
-	# save backend config inside container
-	canine_backend_conf = parse_canine_conf_from_env()
-	tmpfile = tempfile.mktemp()
-	with open(tmpfile, "w") as f:
-		json.dump(canine_backend_conf, f, indent=2)
-	subprocess.check_call(["sudo", "cp", tmpfile, "/usr/local/etc/canine_backend_conf.json"])
-	os.remove(tmpfile)
 
 	#
 	# slurmdbd.conf
