@@ -61,7 +61,7 @@ if __name__ == "__main__":
 	# create dummy instance to build image in
 	try:
 		subprocess.check_call("""gcloud compute --project {proj} instances create {host} --zone {zone} \
-		  --machine-type n1-standard-1 --image ubuntu-minimal-1910-eoan-v20200107 \
+		  --machine-type n1-standard-1 --image ubuntu-minimal-2004-focal-v20210119a \
 		  --image-project ubuntu-os-cloud --boot-disk-size 50GB --boot-disk-type pd-standard \
 		  --metadata-from-file startup-script=<({build_script})""".format(
 			host = host, proj = proj, zone = zone, build_script = args.build_script
