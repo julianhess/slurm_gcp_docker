@@ -98,7 +98,6 @@ if __name__ == "__main__":
 	# slurm.conf
 	C = parse_slurm_conf("{CPR}/conf/slurm.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
 	C[["ControlMachine", "ControlAddr", "AccountingStorageHost"]] = ctrl_hostname
-	del C["SuspendExcNodes"]
 
 	# node definitions
 	C["NodeName8"] = "{HN}-worker[1-100] CPUs=8 RealMemory=28000 State=CLOUD Weight=3".format(HN = ctrl_hostname)
