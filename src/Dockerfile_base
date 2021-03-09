@@ -1,4 +1,4 @@
-FROM ubuntu:19.10 as build
+FROM ubuntu:20.04 as build
 
 WORKDIR /tmp
 
@@ -7,6 +7,8 @@ WORKDIR /tmp
 
 # 1. prereqs from apt
 RUN apt-get update && \
+DEBIAN_FRONTEND=noninteractive \
+apt-get -y install --no-install-recommends tzdata && \
 apt-get -y install build-essential vim git python3-pip \
   nfs-common portmap libmariadb-dev mariadb-client mariadb-server \
   munge libmunge-dev libhwloc-dev cgroup-tools libreadline-dev ssed wget sudo curl
