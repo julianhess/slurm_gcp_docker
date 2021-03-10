@@ -13,8 +13,7 @@ sudo dpkg -i "containerd.io_1.2.6-3_amd64.deb" && \
 sudo dpkg -i "docker-ce-cli_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
 sudo dpkg -i "docker-ce_19.03.3~3-0~ubuntu-disco_amd64.deb" && \
 # SLURM GCP SCRIPTS
-sudo git clone https://github.com/getzlab/slurm_gcp_docker /usr/local/share/slurm_gcp_docker && \
-sudo adduser $USER docker && \
+sudo chmod 666 /var/run/docker.sock && \
 # ENABLE CGROUPS
 sudo ssed -R -i '/GRUB_CMDLINE_LINUX_DEFAULT/s/(.*)"(.*)"(.*)/\1"\2 cgroup_enable=memory swapaccount=1"\3/' /etc/default/grub && \
 sudo update-grub && \
@@ -37,11 +36,20 @@ After=docker.service
 After=docker.socket
 EOF"
 
+# Wait for transferring the docker base image (generate_container_host_image.py)
+echo "touch /started"
+
+# Load docker base image
+echo "while ! [ -f /data_transferred ]; do sleep 1; done"
+echo "sudo docker load -i /tmp/tmp_docker_file"
+
 # build current user into container
 VERSION=$(cat VERSION)
+docker_base_image=$(cat DOCKER_SRC)
 echo "sudo docker build -t broadinstitute/slurm_gcp_docker:$VERSION \
   -t broadinstitute/slurm_gcp_docker:latest \
   --build-arg HOST_USER=$USER --build-arg UID=$UID --build-arg GID=$(id -g) \
+  --build-arg DOCKER_BASE_IMAGE=$docker_base_image:$VERSION \
   /usr/local/share/slurm_gcp_docker/src"
 
-echo "touch /started"
+echo "touch /completed"
