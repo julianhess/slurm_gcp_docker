@@ -1,4 +1,4 @@
-ARG DOCKER_BASE_IMAGE=gcr.io/broad-getzlab-workflows/slurm_gcp_docker_base
+ARG DOCKER_BASE_IMAGE
 FROM $DOCKER_BASE_IMAGE
 
 # add current user to container; enable passwordless sudo and rootless docker
