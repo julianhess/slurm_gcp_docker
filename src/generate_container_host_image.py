@@ -133,7 +133,7 @@ if __name__ == "__main__":
 		#
 		# wait for startup script to be completed
 		subprocess.check_call("""
-		  echo -n "Waiting for dummy instance completing startup script ..."
+		  echo -n "Waiting for dummy instance to complete startup script ..."
 		  while ! gcloud compute ssh {host} --zone {zone} -- -o "UserKnownHostsFile /dev/null" \
 		    "[ -f /completed ]" &> /dev/null; do
 			  sleep 1

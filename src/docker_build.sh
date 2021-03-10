@@ -10,9 +10,11 @@ VERSION=$(cat VERSION)
 ##    This is the local image built by docker_build_base.sh
 ## 2. Otherwise use gcr.io/broad-getzlab-workflows/slurm_gcp_docker_base:$VERSION
 
-if [ $# -gt 0 ]; then
-	# TODO: allow version to be specified too
+if [ $# == 2 ]; then
+	echo "Using base image specified as command line argument: $1:$2"
 	docker_base_image=$1
+	VERSION=$2
+	echo -n $VERSION > VERSION
 else
 	if sudo docker image inspect broadinstitute/slurm_gcp_docker_base:$VERSION &> /dev/null; then
 		echo "Building docker image from broadinstitute/slurm_gcp_docker_base:$VERSION (local)"
@@ -28,3 +30,5 @@ sudo docker build -t broadinstitute/slurm_gcp_docker:$VERSION \
   --build-arg HOST_USER=$USER --build-arg UID=$UID --build-arg GID=$(id -g) \
   --build-arg DOCKER_BASE_IMAGE="$docker_base_image":"$VERSION" \
   .
+
+echo -n $docker_base_image > DOCKER_SRC
