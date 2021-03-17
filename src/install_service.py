@@ -12,5 +12,8 @@ def main():
     subprocess.check_call(["mkdir", "-p", os.path.expanduser("~/.config/systemd/user")])
     subprocess.check_call(["cp", wolfagent, os.path.expanduser("~/.config/systemd/user/userwolfagent.service")])
 
+    subprocess.check_call(["sudo", "systemctl", "daemon-reload"])
+    subprocess.check_call(["systemctl", "--user", "daemon-reload"])
+
 if __name__ == "__main__":
     main()
