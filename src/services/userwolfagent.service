@@ -8,6 +8,7 @@ Type=exec
 Environment="WOLF_LOG_PATH=null"
 ExecStart=python3 -c 'from wolf import standalone; standalone.wolfagent()'
 WorkingDirectory=~
+# Send SIGINT first, which allows graceful shutdown of the canine backend. Send SIGKILL in case the backend hangs.
 KillMode=mixed
 KillSignal=SIGINT
 TimeoutStopSec=120
