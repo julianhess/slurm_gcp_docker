@@ -12,6 +12,10 @@ def main():
     subprocess.check_call(["mkdir", "-p", os.path.expanduser("~/.config/systemd/user")])
     subprocess.check_call(["cp", caninebackend, os.path.expanduser("~/.config/systemd/user/caninebackend.service")])
 
+    subprocess.check_call(["mkdir", "-p", os.path.expanduser("~/.prefect")])
+    with open(os.path.expanduser("~/.prefect/backend.toml"), "w") as f:
+        f.write('backend = "server"\n')
+
     subprocess.check_call(["sudo", "systemctl", "daemon-reload"])
     subprocess.check_call(["systemctl", "--user", "daemon-reload"])
 
