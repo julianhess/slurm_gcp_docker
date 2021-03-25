@@ -26,11 +26,20 @@ os.environ["CLOUDSDK_CONFIG"] = subprocess.check_output(
 # get list of nodenames to create
 hosts = subprocess.check_output("scontrol show hostnames {}".format(sys.argv[1]), shell = True).decode().rstrip().split("\n")
 
+# For preemptible partition, partition name is same as machine type.
+# For nonpreemptible partition, partition_name == machine_type + "-nonp"
+def map_partition_machinetype(partition):
+	if partition.endswith("-nonp"):
+		return partition[:-len("-nonp")]
+	else:
+		return partition
+
 # create all the nodes of each machine type at once
 # XXX: gcloud assumes that sys.stdin will always be not None, so we need to pass
 #      dummy stdin (/dev/null)
 for key, host_list in node_LuT.loc[hosts].groupby(["machine_type", "preemptible"]):
 	machine_type, not_nonpreemptible_part = key
+	machine_type = map_partition_machinetype(machine_type)
 
 	# override 'preemptible' flag if this node is in the "non-preemptible" partition
 	if not not_nonpreemptible_part:
