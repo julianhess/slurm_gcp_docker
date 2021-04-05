@@ -5,6 +5,7 @@ import os
 import sys
 import subprocess
 import pickle
+import re
 
 # load node machine type lookup table
 node_LuT = pd.read_pickle("/mnt/nfs/clust_conf/slurm/host_LuT.pickle")
@@ -34,12 +35,24 @@ def map_partition_machinetype(partition):
 	else:
 		return partition
 
+# increase disk size so that: 1. match disk io with network io; 2. allow workloads that
+# put intermediate files to /tmp.
+def map_partition_disksize(partition):
+	try:
+		ncore = int(re.search("[^-]+-[^-]+-(.*)", partition)[1])
+		ans = min(100 + ncore * 50, 500)
+	except Exception:
+		# fallback
+		ans = 100
+	return str(ans) + "GB"
+
 # create all the nodes of each machine type at once
 # XXX: gcloud assumes that sys.stdin will always be not None, so we need to pass
 #      dummy stdin (/dev/null)
 for key, host_list in node_LuT.loc[hosts].groupby(["machine_type", "preemptible"]):
 	machine_type, not_nonpreemptible_part = key
 	machine_type = map_partition_machinetype(machine_type)
+	disk_size = map_partition_disksize(machine_type)
 
 	# override 'preemptible' flag if this node is in the "non-preemptible" partition
 	if not not_nonpreemptible_part:
@@ -50,9 +63,10 @@ for key, host_list in node_LuT.loc[hosts].groupby(["machine_type", "preemptible"
 	host_table = subprocess.Popen(
 	  """gcloud compute instances create {HOST_LIST} --image {image} \
 	     --machine-type {MT} --zone {compute_zone} {compute_script} {preemptible} \
+         --boot-disk-size {DISK_SIZE} \
 	     --tags caninetransientimage --format 'csv(name,networkInterfaces[0].networkIP)'
 	  """.format(
-	    HOST_LIST = " ".join(host_list.index), MT = machine_type, **k9_backend_conf
+	    HOST_LIST = " ".join(host_list.index), MT = machine_type, DISK_SIZE = disk_size, **k9_backend_conf
 	  ), shell = True, executable = '/bin/bash', stdin = subprocess.DEVNULL, stdout = subprocess.PIPE
 	)
 
