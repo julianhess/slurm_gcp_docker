@@ -107,6 +107,7 @@ if __name__ == "__main__":
 		{ "type":  "n1-highmem-4", "cpus":  "4", "realmemory":  "23200", "weight": "4" , "number": 1000, "preemptible":  True },
 		{ "type":  "n1-highmem-8", "cpus":  "8", "realmemory":  "50200", "weight": "4" , "number":  100, "preemptible":  True },
 		#{ "type": "n1-highmem-16", "cpus": "16", "realmemory": "102200", "weight": "4" , "number":   10, "preemptible":  True },
+		#{ "type": "n1-highmem-32", "cpus": "32", "realmemory": "204200", "weight": "4" , "number":   10, "preemptible":  True },
 		## Non-preemptible nodes
 		{ "type":  "n1-highmem-8", "cpus":  "8", "realmemory":  "50200", "weight": "4" , "number":  100, "preemptible": False },
 	]
