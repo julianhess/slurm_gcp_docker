@@ -11,7 +11,6 @@ import shlex
 import socket
 import subprocess
 import itertools
-import json
 # sys.path.append("/home/jhess/j/proj/") # TODO: remove this line when Capy is a package
 # from capy import txt
 
@@ -105,10 +104,7 @@ if __name__ == "__main__":
 	## E.g.
 	##   { "type": "n1-highmem-16", "cpus": "16", "realmemory": "102200", "weight": "4" , "number":   10, "preemptible":  True }
 	##   { "type": "n1-highmem-32", "cpus": "32", "realmemory": "204200", "weight": "4" , "number":   10, "preemptible":  True }
-	with open(os.path.join(os.path.dirname(__file__), "../conf/nodetypes.json")) as f:
-		NODE_TYPES = json.load(f)
-	
-	NODE_TYPES = pd.DataFrame.from_dict(NODE_TYPES)
+	NODE_TYPES = pd.from_json(os.path.join(os.path.dirname(__file__), "../conf/nodetypes.json"))
 	NODE_TYPES["range_end"]   = np.cumsum(NODE_TYPES["number"])
 	NODE_TYPES["range_start"] = np.append([1], NODE_TYPES["range_end"][:-1] + 1) 
 	NODE_TYPES["nodes"]       = NODE_TYPES.apply(lambda row: "{HN}-worker[{range_start}-{range_end}]".format(HN=ctrl_hostname, **row), axis=1)
