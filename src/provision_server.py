@@ -5,10 +5,12 @@ import io
 import os
 import pwd
 import pandas as pd
+import numpy as np
 import re
 import shlex
 import socket
 import subprocess
+import itertools
 # sys.path.append("/home/jhess/j/proj/") # TODO: remove this line when Capy is a package
 # from capy import txt
 
@@ -98,28 +100,35 @@ if __name__ == "__main__":
 	C = parse_slurm_conf("{CPR}/conf/slurm.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
 	C[["ControlMachine", "ControlAddr", "AccountingStorageHost"]] = ctrl_hostname
 
+	## Additional nodes can be added to conf/nodetypes.json
+	## E.g.
+	##   { "type": "n1-highmem-16", "cpus": "16", "realmemory": "102200", "weight": "4" , "number":   10, "preemptible":  True }
+	##   { "type": "n1-highmem-32", "cpus": "32", "realmemory": "204200", "weight": "4" , "number":   10, "preemptible":  True }
+	NODE_TYPES = pd.from_json(os.path.join(os.path.dirname(__file__), "../conf/nodetypes.json"))
+	NODE_TYPES["range_end"]   = np.cumsum(NODE_TYPES["number"])
+	NODE_TYPES["range_start"] = np.append([1], NODE_TYPES["range_end"][:-1] + 1) 
+	NODE_TYPES["nodes"]       = NODE_TYPES.apply(lambda row: "{HN}-worker[{range_start}-{range_end}]".format(HN=ctrl_hostname, **row), axis=1)
+	NODE_TYPES["partition1"]  = np.where(NODE_TYPES["preemptible"], NODE_TYPES["type"], NODE_TYPES["type"] + "-nonp")
+	NODE_TYPES["partition2"]  = np.where(NODE_TYPES["preemptible"], "main", "nonpreemptible")
+
 	# node definitions
-	C["NodeName8"] = "{HN}-worker[1-100] CPUs=8 RealMemory=28000 State=CLOUD Weight=3".format(HN = ctrl_hostname)
-	C["NodeName1"] = "{HN}-worker[101-2000] CPUs=1 RealMemory=3000 State=CLOUD Weight=2".format(HN = ctrl_hostname)
-	C["NodeName4"] = "{HN}-worker[2001-3000] CPUs=4 RealMemory=23000 State=CLOUD Weight=4".format(HN = ctrl_hostname)
-	C["NodeName88"] = "{HN}-worker[3001-3500] CPUs=8 RealMemory=50000 State=CLOUD Weight=4".format(HN = ctrl_hostname)
-	C["NodeName89"] = "{HN}-worker[3501-3600] CPUs=8 RealMemory=50000 State=CLOUD Weight=4".format(HN = ctrl_hostname) # non-preemptible
+	for idx, row in NODE_TYPES.iterrows():
+		C["NodeName" + str(idx+1)] = "{nodes} CPUs={cpus} RealMemory={realmemory} State=CLOUD Weight={weight}".format(HN=ctrl_hostname, **dict(row))
 
 	# partition definitions
 	C["PartitionName"] = "DEFAULT MaxTime=INFINITE State=UP".format(HN = ctrl_hostname)
-	C["PartitionName8"] = "n1-standard-8 Nodes={HN}-worker[1-100]".format(HN = ctrl_hostname)
-	C["PartitionName1"] = "n1-standard-1 Nodes={HN}-worker[101-2000]".format(HN = ctrl_hostname)
-	C["PartitionName4"] = "n1-highmem-4 Nodes={HN}-worker[2001-3000]".format(HN = ctrl_hostname)
-	C["PartitionName88"] = "n1-highmem-8 Nodes={HN}-worker[3001-3500]".format(HN = ctrl_hostname)
-	C["PartitionName89"] = "n1-highmem-8-nonp Nodes={HN}-worker[3501-3600]".format(HN = ctrl_hostname)
-	C["PartitionName888"] = "main Nodes={HN}-worker[1-3500] Default=YES".format(HN = ctrl_hostname) # Default partition, preemptible
-	C["PartitionName889"] = "nonpreemptible Nodes={HN}-worker[3501-3600] Default=NO".format(HN = ctrl_hostname) # Non-preemptible partition
-	C["PartitionName999"] = "all Nodes={HN}-worker[1-3600] Default=NO".format(HN = ctrl_hostname)
+
+	for idx, row in NODE_TYPES.iterrows():
+		C["PartitionName" + str(idx+1)] = "{partition1} Nodes={nodes}".format(HN=ctrl_hostname, **dict(row))
+
+	C["PartitionName888"] = "main Nodes={} Default=YES".format(",".join(NODE_TYPES.loc[NODE_TYPES["partition2"] == "main"]["nodes"]))
+	C["PartitionName889"] = "nonpreemptible Nodes={} Default=NO".format(",".join(NODE_TYPES.loc[NODE_TYPES["partition2"] == "nonpreemptible"]["nodes"]))
+	C["PartitionName999"] = "all Nodes={} Default=NO".format(",".join(NODE_TYPES["nodes"]))
 
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
 	nonstandardparts = ["all", "main", "nonpreemptible"]
-	nonpreemptible_range = range(3501, 3600 + 1)
+	nonpreemptible_range = list(itertools.chain(*NODE_TYPES.apply(lambda row: range(row.range_start, row.range_end+1), axis=1)))
 
 	#
 	# save node lookup table
