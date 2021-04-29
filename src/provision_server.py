@@ -11,6 +11,7 @@ import shlex
 import socket
 import subprocess
 import itertools
+import json
 # sys.path.append("/home/jhess/j/proj/") # TODO: remove this line when Capy is a package
 # from capy import txt
 
@@ -100,17 +101,13 @@ if __name__ == "__main__":
 	C = parse_slurm_conf("{CPR}/conf/slurm.conf".format(CPR = shlex.quote(CLUST_PROV_ROOT)))
 	C[["ControlMachine", "ControlAddr", "AccountingStorageHost"]] = ctrl_hostname
 
-	NODE_TYPES = [
-		## Preemptible nodes
-		{ "type": "n1-standard-8", "cpus":  "8", "realmemory":  "28200", "weight": "3" , "number":  100, "preemptible":  True },
-		{ "type": "n1-standard-1", "cpus":  "1", "realmemory":   "3200", "weight": "2" , "number": 1900, "preemptible":  True },
-		{ "type":  "n1-highmem-4", "cpus":  "4", "realmemory":  "23200", "weight": "4" , "number": 1000, "preemptible":  True },
-		{ "type":  "n1-highmem-8", "cpus":  "8", "realmemory":  "50200", "weight": "4" , "number":  100, "preemptible":  True },
-		#{ "type": "n1-highmem-16", "cpus": "16", "realmemory": "102200", "weight": "4" , "number":   10, "preemptible":  True },
-		#{ "type": "n1-highmem-32", "cpus": "32", "realmemory": "204200", "weight": "4" , "number":   10, "preemptible":  True },
-		## Non-preemptible nodes
-		{ "type":  "n1-highmem-8", "cpus":  "8", "realmemory":  "50200", "weight": "4" , "number":  100, "preemptible": False },
-	]
+	## Additional nodes can be added to conf/nodetypes.json
+	## E.g.
+	##   { "type": "n1-highmem-16", "cpus": "16", "realmemory": "102200", "weight": "4" , "number":   10, "preemptible":  True }
+	##   { "type": "n1-highmem-32", "cpus": "32", "realmemory": "204200", "weight": "4" , "number":   10, "preemptible":  True }
+	with open(os.path.join(os.path.dirname(__file__), "../conf/nodetypes.json")) as f:
+		NODE_TYPES = json.load(f)
+	
 	NODE_TYPES = pd.DataFrame.from_dict(NODE_TYPES)
 	NODE_TYPES["range_end"]   = np.cumsum(NODE_TYPES["number"])
 	NODE_TYPES["range_start"] = np.append([1], NODE_TYPES["range_end"][:-1] + 1) 
