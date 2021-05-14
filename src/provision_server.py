@@ -128,7 +128,6 @@ if __name__ == "__main__":
 	print_conf(C, "/mnt/nfs/clust_conf/slurm/slurm.conf")
 
 	nonstandardparts = ["all", "main", "nonpreemptible"]
-	nonpreemptible_range = list(itertools.chain(*NODE_TYPES.apply(lambda row: range(row.range_start, row.range_end+1), axis=1)))
 
 	#
 	# save node lookup table
@@ -138,6 +137,8 @@ if __name__ == "__main__":
 	)
 	parts = parsein(parts, "Nodes", r"(.*)\[(\d+)-(\d+)\]", ["prefix", "start", "end"])
 	parts = parts.loc[~parts["start"].isna() & (~parts["partition"].isin(nonstandardparts))].astype({ "start" : int, "end" : int })
+
+	nonpreemptible_range = list(itertools.chain(*[range(x, y + 1) for x, y in parts.loc[parts["partition"].str.contains(r"-nonp$"), ["start", "end"]].values]))
 
 	nodes = []
 	for part in parts.itertuples():
