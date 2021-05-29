@@ -39,7 +39,7 @@ def get_current_zone():
     zone = re.sub(".*/", "", zone)
     return zone
 
-def create_instance(instance_name, project=None, zone=None, machine_type="n1-standard-4", boot_disk_size=200):
+def create_wolfcontroller(instance_name, project=None, zone=None, machine_type="n1-standard-4", boot_disk_size=200):
     if project is None:
         project = get_current_project()
     if zone is None:
@@ -96,7 +96,7 @@ def main():
     parser.add_argument("--boot-disk-size", type=int, default=200)
     args = parser.parse_args()
     download_getzlab_ssh_key()
-    create_instance(args.instance_name, project=args.project, zone=args.zone, machine_type=args.machine_type, boot_disk_size=args.boot_disk_size)
+    create_wolfcontroller(args.instance_name, project=args.project, zone=args.zone, machine_type=args.machine_type, boot_disk_size=args.boot_disk_size)
 
 if __name__ == "__main__":
     main()
