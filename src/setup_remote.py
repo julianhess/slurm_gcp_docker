@@ -56,7 +56,8 @@ def create_instance(instance_name, project=None, zone=None, machine_type="n1-sta
             --boot-disk-size {boot_disk_size}GB \
             --boot-disk-type pd-standard \
             --metadata=enable-oslogin=TRUE \
-            --scopes cloud-platform,compute-rw"
+            --scopes cloud-platform,compute-rw \
+            --tags=wolfcontroller"
             #--metadata-from-file startup-script={startup_script},shutdown-script={shutdown_script} \
             , shell=True
     )
