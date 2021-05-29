@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import subprocess, os, sys, re, time
+import subprocess, os, sys, re, time, textwrap
 
 this_dir = os.path.dirname(__file__)
 SLURM_GCP_DOCKER_DIR = os.path.realpath(os.path.join(this_dir, ".."))
@@ -85,6 +85,11 @@ def create_wolfcontroller(instance_name, project=None, zone=None, machine_type="
     subprocess.check_call(
         f'gcloud compute ssh {instance_name} --zone {zone} --project {project} -- -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -T "bash ~/slurm_gcp_docker/src/setup_remote_user_startup_script.sh"', shell=True
     )
+
+    print(textwrap.dedent(f"""
+    Connect to the controller with following command and open browser at http://localhost:8080
+        gcloud compute ssh --project {project} --zone {zone} {instance_name} -- -L 8080:localhost:8080 -L 8081:localhost:8081 -L 8882:localhost:8882 -L 4200:localhost:4200
+    """))
 
 def main():
     import argparse
