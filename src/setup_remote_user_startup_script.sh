@@ -35,6 +35,8 @@ if ! [ -f /.startup ]; then
     (cd ~/canine && git checkout master && sudo pip3 install .)
     (cd ~/wolF && git checkout master && sudo pip3 install .)
 
+    cp -r ~/wolF/examples ~/examples
+
     ## auth ssh key
     mkdir -p ~/.ssh
     cat ~/slurm_gcp_docker/getzlabkey.pub >> ~/.ssh/authorized_keys
