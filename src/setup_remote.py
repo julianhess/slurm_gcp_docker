@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import subprocess, os, sys, re, time, textwrap
+import subprocess, os, sys, re, time, textwrap, getpass
 
 this_dir = os.path.dirname(__file__)
 SLURM_GCP_DOCKER_DIR = os.path.realpath(os.path.join(this_dir, ".."))
@@ -44,6 +44,8 @@ def create_wolfcontroller(instance_name, project=None, zone=None, machine_type="
         project = get_current_project()
     if zone is None:
         zone = get_current_zone()
+    
+    wolfuser = getpass.getuser()
     ## I used "enable-oslogin=TRUE", which ensures consistent UID within a project.
     subprocess.check_call(
         f"gcloud compute instances create {instance_name} \
@@ -57,7 +59,8 @@ def create_wolfcontroller(instance_name, project=None, zone=None, machine_type="
             --boot-disk-type pd-standard \
             --metadata=enable-oslogin=TRUE \
             --scopes cloud-platform,compute-rw \
-            --tags=wolfcontroller"
+            --tags=wolfcontroller \
+            --metadata=wolfuser={wolfuser}"
             #--metadata-from-file startup-script={startup_script},shutdown-script={shutdown_script} \
             , shell=True
     )
