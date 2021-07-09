@@ -57,10 +57,9 @@ def create_wolfcontroller(instance_name, project=None, zone=None, machine_type="
             --image-project ubuntu-os-cloud \
             --boot-disk-size {boot_disk_size}GB \
             --boot-disk-type pd-standard \
-            --metadata=enable-oslogin=TRUE \
             --scopes cloud-platform,compute-rw \
             --tags=wolfcontroller \
-            --metadata=wolfuser={wolfuser}"
+            --metadata=enable-oslogin=TRUE,wolfuser={wolfuser}"
             #--metadata-from-file startup-script={startup_script},shutdown-script={shutdown_script} \
             , shell=True
     )
