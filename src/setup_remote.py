@@ -90,7 +90,7 @@ def create_wolfcontroller(instance_name, project=None, zone=None, machine_type="
 
     print(textwrap.dedent(f"""
     Connect to the controller with following command and open browser at http://localhost:8080
-        gcloud compute ssh --project {project} --zone {zone} {instance_name} -- -L 8080:localhost:8080 -L 8081:localhost:8081 -L 8882:localhost:8882 -L 4200:localhost:4200
+        gcloud compute ssh --project {project} --zone {zone} {instance_name} -- -L 8080:localhost:8080 -L 8889:localhost:8889 -L 8888:localhost:8888 -L 4200:localhost:4200
     """))
 
 def main():

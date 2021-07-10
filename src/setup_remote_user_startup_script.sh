@@ -50,13 +50,13 @@ if ! [ -f /.startup ]; then
     ## start prefect server and jupyter notebook
     sudo systemctl start prefectserver          # port 8080 and 4200
     sudo systemctl enable prefectserver
-    systemctl start --user jupyternotebook # port 8082
+    systemctl start --user jupyternotebook # port 8888
     systemctl enable --user jupyternotebook
 
     ## vs code
     curl -fsSL https://code-server.dev/install.sh | sh
     mkdir -p ~/.config/code-server
-    echo 'bind-addr: 127.0.0.1:8081' > ~/.config/code-server/config.yaml
+    echo 'bind-addr: 127.0.0.1:8889' > ~/.config/code-server/config.yaml
     echo 'auth: none'                >> ~/.config/code-server/config.yaml
     echo 'cert: false'               >> ~/.config/code-server/config.yaml
 
